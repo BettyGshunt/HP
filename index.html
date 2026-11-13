@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TFT Set 18 Quiz for Melih</title>
+<title>Balatro Jokers Quiz for Melih</title>
 <style>
   body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-         background: radial-gradient(circle at top, #1f4d2e, #06140b); color:#eef4f8;
+         background: radial-gradient(circle at top, #4a1520, #120508); color:#eef4f8;
          font-family: Georgia, "Times New Roman", serif; }
-  .card { width:min(92vw, 560px); background:#0f2416; border:2px solid #c9a227; border-radius:16px;
+  .card { width:min(92vw, 560px); background:#1e0d14; border:2px solid #c9a227; border-radius:16px;
           padding:28px; box-shadow:0 0 40px rgba(201,162,39,.25); }
   h1 { margin:0 0 6px; color:#e8c547; font-size:1.7rem; text-align:center; }
   .sub { text-align:center; opacity:.8; margin-bottom:22px; }
   .progress { font-size:.9rem; opacity:.75; margin-bottom:8px; }
   .q { font-size:1.2rem; margin-bottom:18px; }
   button.opt { display:block; width:100%; text-align:left; margin:8px 0; padding:12px 14px;
-               font:inherit; color:#eef4f8; background:#1a3a24; border:1px solid #3f8a55;
+               font:inherit; color:#eef4f8; background:#3a1622; border:1px solid #b0394f;
                border-radius:10px; cursor:pointer; transition:.15s; }
-  button.opt:hover:not(:disabled) { background:#255233; }
+  button.opt:hover:not(:disabled) { background:#52202f; }
   button.opt.right { background:#1f5b3a; border-color:#3fbf7a; }
   button.opt.wrong { background:#6b1f2a; border-color:#d9475b; }
   .fb { min-height:1.4em; margin:12px 0; font-style:italic; }
-  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#0f2416;
+  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#1e0d14;
                     border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
   .center { text-align:center; }
   .big { font-size:3rem; margin:10px 0; }
@@ -31,32 +31,32 @@
 <div class="card" id="app"></div>
 <script>
 const questions = [
-  { q: "What is the name of TFT Set 18?", a: ["Space Gods", "Lore & Legends", "Enchanted Wilds", "Magic n' Mayhem"], c: 2,
-    f: "Enchanted Wilds – a magical forest full of beasts and spirits." },
-  { q: "What is the set mechanic of Enchanted Wilds called?", a: ["Charms", "Wisps", "Portals", "Encounters"], c: 1,
-    f: "Wisps – little magic sprites that show up in your shop." },
-  { q: "Wisps are a comeback of which mechanic from Set 12 (Magic n' Mayhem)?", a: ["Charms", "Augments", "Anomalies", "Hextech Gates"], c: 0,
-    f: "Charms! Riot brought them back and renamed them Wisps." },
-  { q: "How many Wisps can you buy per round?", a: ["1", "2", "3", "As many as you can afford"], c: 0,
-    f: "Only 1 per round – so choose wisely!" },
-  { q: "In which shop slot does a Wisp appear?", a: ["The leftmost slot", "The middle slot", "The rightmost slot", "A random slot"], c: 2,
-    f: "The rightmost slot, in every other shop – it covers up the champion behind it." },
-  { q: "Which trait makes your Wisps stronger?", a: ["Blossom", "Coven", "Fae", "Inferno"], c: 0,
-    f: "Blossom – after combat, your Wisps get empowered." },
-  { q: "With which trait can you get the Elder Dragon?", a: ["Primal", "Riftbeast", "Monolith", "Old Growth"], c: 1,
-    f: "Riftbeast – and the Elder Dragon (Apex Predator) takes up 2 team slots!" },
-  { q: "Which 5-cost champion comes in three different versions?", a: ["Ashe", "Gnar", "Kennen", "Lux"], c: 3,
-    f: "Lux – as Blackthorn, Blossom or Coven. She's an Avatar and counts twice for her trait." },
-  { q: "Which 5-cost champion has his very own trait called Greenfather?", a: ["Ivern", "Draven", "Gnar", "Alune"], c: 0,
-    f: "Ivern – his seeds grow special hexes that boost whoever stands on them." },
-  { q: "Which champion is the Bounty Seeker who completes bounties for rewards?", a: ["Ashe", "Draven", "Kennen", "Kha'Zix"], c: 1,
-    f: "Draven – choose a bounty and he works on it to earn you loot." },
-  { q: "What does the Eclipse trait do?", a: ["Gives your team a big shield", "Kills the lowest-Health enemy every few seconds", "Doubles your gold", "Freezes all enemies"], c: 1,
-    f: "After 10 seconds of combat, Eclipse executes the lowest-Health enemy over and over!" },
-  { q: "Which trait gives you plants you can place on the board?", a: ["Greenfather", "Thornmaiden", "Elderwood", "Flora Fatalis"], c: 2,
-    f: "Elderwood – the plants get stronger at higher trait levels." },
-  { q: "Which classic mechanic came back in Set 18 after Set 17 changed it?", a: ["The Carousel", "The Armory", "Hyper Roll", "Double Up"], c: 0,
-    f: "The Carousel – pick a champion with an item, lowest health first!" }
+  { q: "Who created Balatro?", a: ["Supergiant Games", "LocalThunk", "ConcernedApe", "Mega Crit"], c: 1,
+    f: "LocalThunk – a solo developer from Canada. Playstack published it." },
+  { q: "How many Joker slots do you start a run with?", a: ["3", "4", "5", "6"], c: 2,
+    f: "5 Joker slots – a Negative Joker gives you one more." },
+  { q: "What does the basic \"Joker\" card give you?", a: ["+4 Mult", "+30 Chips", "X2 Mult", "$4 per round"], c: 0,
+    f: "+4 Mult – simple but useful early on." },
+  { q: "What does Blueprint do?", a: ["Copies the Joker to its right", "Copies the leftmost Joker", "Doubles all your Chips", "Creates a Tarot card"], c: 0,
+    f: "Blueprint copies the ability of the Joker to its right." },
+  { q: "And what does Brainstorm copy?", a: ["The Joker to its right", "The leftmost Joker", "The last Joker you bought", "A random Joker"], c: 1,
+    f: "Brainstorm copies your leftmost Joker – combine it with Blueprint for big combos!" },
+  { q: "What can happen to Gros Michel at the end of a round?", a: ["It doubles its Mult", "It turns into gold", "It can go extinct (1 in 6 chance)", "It becomes Negative"], c: 2,
+    f: "1 in 6 chance it gets destroyed – the banana goes extinct!" },
+  { q: "After Gros Michel goes extinct, which Joker can show up?", a: ["Ice Cream", "Cavendish", "Popcorn", "Turtle Bean"], c: 1,
+    f: "Cavendish – X3 Mult, with only a 1 in 1000 chance to be destroyed." },
+  { q: "Which of these is NOT a Legendary Joker?", a: ["Perkeo", "Chicot", "Triboulet", "Blueprint"], c: 3,
+    f: "Blueprint is Rare. The Legendaries are Canio, Triboulet, Yorick, Chicot and Perkeo." },
+  { q: "How do you usually get a Legendary Joker?", a: ["Buy it in the shop", "From The Soul Spectral card", "Beat Ante 8", "Sell 5 Jokers"], c: 1,
+    f: "The Soul – a rare Spectral card that creates a Legendary Joker." },
+  { q: "What does Chicot do?", a: ["Disables every Boss Blind", "Gives X2 Mult for Kings and Queens", "Copies consumables", "Gains Mult when cards are destroyed"], c: 0,
+    f: "Chicot disables the effect of every Boss Blind." },
+  { q: "Which Legendary Joker makes played Kings and Queens give X2 Mult?", a: ["Canio", "Yorick", "Triboulet", "Perkeo"], c: 2,
+    f: "Triboulet – the royal jester!" },
+  { q: "What does a Negative edition Joker give you?", a: ["X1.5 Mult", "+50 Chips", "+1 Joker slot", "+$5 sell value"], c: 2,
+    f: "+1 Joker slot – so it basically doesn't take up space." },
+  { q: "What does the Egg Joker do?", a: ["Gains $3 of sell value every round", "Hatches into a Rare Joker", "Gives +10 Mult once", "Adds a card to your deck"], c: 0,
+    f: "Egg gains $3 sell value at the end of every round – sell it later for cash!" }
 ];
 
 let i = 0, score = 0;
@@ -64,10 +64,10 @@ const app = document.getElementById("app");
 
 function start() {
   app.innerHTML = `
-    <h1>🌿 TFT Set 18: Enchanted Wilds Quiz 🌿</h1>
-    <div class="sub">Made for Melih – are you a Challenger player?</div>
-    <div class="center"><div class="big">🧚</div>
-    <p>${questions.length} questions. GL HF!</p>
+    <h1>🃏 Balatro Jokers Quiz 🃏</h1>
+    <div class="sub">Made for Melih – do you know your Jokers?</div>
+    <div class="center"><div class="big">🃏</div>
+    <p>${questions.length} questions. Let's see that Mult!</p>
     <button class="next" onclick="show()">Start</button></div>`;
 }
 
@@ -97,10 +97,10 @@ function next() { i++; i < questions.length ? show() : result(); }
 
 function result() {
   const pct = score / questions.length;
-  const title = pct === 1 ? "Challenger! You're the best in the lobby! 🏆"
-              : pct >= .7 ? "Diamond – top 4 every game! 💎"
-              : pct >= .4 ? "Gold – solid, keep climbing! 🥇"
-              : "Iron for now – one more game, Melih! 🐧";
+  const title = pct === 1 ? "Gold Stake champion! 🏆"
+              : pct >= .7 ? "Huge Mult! You'd beat Ante 8! 🔥"
+              : pct >= .4 ? "Not bad – but the Boss Blind is waiting! 🎲"
+              : "Game over on Ante 1 – shuffle and try again, Melih! 🃏";
   app.innerHTML = `
     <h1>Well done, Melih!</h1>
     <div class="center"><div class="big">${score} / ${questions.length}</div>
