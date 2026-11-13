@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Harry Potter Quiz for Melih</title>
+<title>TFT Quiz for Melih</title>
 <style>
   body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-         background: radial-gradient(circle at top, #2a1f4d, #0d0a1a); color:#f3e9c6;
+         background: radial-gradient(circle at top, #10334d, #050d18); color:#eef4f8;
          font-family: Georgia, "Times New Roman", serif; }
-  .card { width:min(92vw, 560px); background:#1b1433; border:2px solid #c9a227; border-radius:16px;
+  .card { width:min(92vw, 560px); background:#0c1d2e; border:2px solid #c9a227; border-radius:16px;
           padding:28px; box-shadow:0 0 40px rgba(201,162,39,.25); }
   h1 { margin:0 0 6px; color:#e8c547; font-size:1.7rem; text-align:center; }
   .sub { text-align:center; opacity:.8; margin-bottom:22px; }
   .progress { font-size:.9rem; opacity:.75; margin-bottom:8px; }
   .q { font-size:1.2rem; margin-bottom:18px; }
   button.opt { display:block; width:100%; text-align:left; margin:8px 0; padding:12px 14px;
-               font:inherit; color:#f3e9c6; background:#2a2050; border:1px solid #5b4b8a;
+               font:inherit; color:#eef4f8; background:#14304a; border:1px solid #2f6a92;
                border-radius:10px; cursor:pointer; transition:.15s; }
-  button.opt:hover:not(:disabled) { background:#3a2d6b; }
+  button.opt:hover:not(:disabled) { background:#1d4466; }
   button.opt.right { background:#1f5b3a; border-color:#3fbf7a; }
   button.opt.wrong { background:#6b1f2a; border-color:#d9475b; }
   .fb { min-height:1.4em; margin:12px 0; font-style:italic; }
-  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#1b1433;
+  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#0c1d2e;
                     border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
   .center { text-align:center; }
   .big { font-size:3rem; margin:10px 0; }
@@ -31,30 +31,30 @@
 <div class="card" id="app"></div>
 <script>
 const questions = [
-  { q: "Which of these was NOT one of Voldemort's Horcruxes?", a: ["Hufflepuff's Cup", "Ravenclaw's Diadem", "Gryffindor's Sword", "Slytherin's Locket"], c: 2,
-    f: "Gryffindor's Sword – it was actually used to DESTROY Horcruxes." },
-  { q: "What form does Hermione's Patronus take?", a: ["A hare", "An otter", "A Jack Russell terrier", "A doe"], c: 1,
-    f: "An otter. (Luna's is a hare, Ron's a terrier, Snape's a doe.)" },
-  { q: "What is the core of Harry's wand?", a: ["Dragon heartstring", "Unicorn hair", "Phoenix feather", "Thestral tail hair"], c: 2,
-    f: "Phoenix feather – from Fawkes, the same phoenix that gave a feather for Voldemort's wand." },
-  { q: "What is Dumbledore's full name?", a: ["Albus Percival Wulfric Brian Dumbledore", "Albus Brian Aberforth Dumbledore", "Albus Wulfric Gellert Dumbledore", "Albus Percival Ignotus Dumbledore"], c: 0,
-    f: "Albus Percival Wulfric Brian Dumbledore." },
-  { q: "Who kills Bellatrix Lestrange in the Battle of Hogwarts?", a: ["Neville Longbottom", "Hermione Granger", "Minerva McGonagall", "Molly Weasley"], c: 3,
-    f: "Molly Weasley – defending her daughter Ginny." },
-  { q: "What is the name of the Black family's house-elf?", a: ["Winky", "Hokey", "Kreacher", "Dobby"], c: 2,
-    f: "Kreacher. (Dobby served the Malfoys, Winky the Crouches, Hokey Hepzibah Smith.)" },
-  { q: "What was the name of Voldemort's mother?", a: ["Eileen Prince", "Merope Gaunt", "Ariana Dumbledore", "Kendra Gaunt"], c: 1,
-    f: "Merope Gaunt – a descendant of Salazar Slytherin." },
-  { q: "Which professional Quidditch team does Ginny play for?", a: ["Chudley Cannons", "Puddlemere United", "Holyhead Harpies", "Montrose Magpies"], c: 2,
-    f: "The Holyhead Harpies – an all-female team." },
-  { q: "What does Dumbledore tell Harry he sees in the Mirror of Erised?", a: ["His family", "The Elder Wand", "A pair of thick woollen socks", "Himself as Minister for Magic"], c: 2,
-    f: "Woollen socks – \"One can never have enough socks.\" (Probably not the whole truth!)" },
-  { q: "How many points is catching the Golden Snitch worth?", a: ["50", "100", "150", "200"], c: 2,
-    f: "150 points – and it ends the match." },
-  { q: "What is the address of the Order of the Phoenix headquarters?", a: ["4 Privet Drive", "12 Grimmauld Place", "Spinner's End", "Shell Cottage"], c: 1,
-    f: "Number 12, Grimmauld Place, London – Sirius Black's family home." },
-  { q: "Who originally made Harry's Invisibility Cloak, according to the Tale of the Three Brothers?", a: ["Antioch Peverell", "Cadmus Peverell", "Ignotus Peverell", "Godric Gryffindor"], c: 2,
-    f: "Ignotus Peverell – Harry is his descendant." }
+  { q: "Which company makes Teamfight Tactics?", a: ["Blizzard", "Riot Games", "Valve", "Supercell"], c: 1,
+    f: "Riot Games – the same studio that makes League of Legends." },
+  { q: "How many players are in a normal TFT lobby?", a: ["4", "6", "8", "10"], c: 2,
+    f: "8 players – only one can finish 1st!" },
+  { q: "How much gold does a shop reroll cost?", a: ["1 gold", "2 gold", "3 gold", "4 gold"], c: 1,
+    f: "2 gold per reroll." },
+  { q: "How much gold do you pay to buy 4 XP?", a: ["2 gold", "4 gold", "5 gold", "10 gold"], c: 1,
+    f: "4 gold for 4 XP." },
+  { q: "What is the maximum interest you can earn per round?", a: ["3 gold", "5 gold", "10 gold", "There is no limit"], c: 1,
+    f: "5 gold – you get 1 gold for every 10 gold you hold, up to 50 gold." },
+  { q: "How many 1-star copies of a champion do you need to make a 3-star?", a: ["3", "6", "9", "12"], c: 2,
+    f: "9 copies: 3 one-stars make a two-star, and 3 two-stars make a three-star." },
+  { q: "What is the most items one champion can hold?", a: ["2", "3", "4", "6"], c: 1,
+    f: "3 items per champion." },
+  { q: "What do you get when you combine two B.F. Swords?", a: ["Infinity Edge", "Bloodthirster", "Deathblade", "Giant Slayer"], c: 2,
+    f: "Deathblade – pure attack damage." },
+  { q: "What do you get when you combine two Tears of the Goddess?", a: ["Blue Buff", "Spear of Shojin", "Archangel's Staff", "Rabadon's Deathcap"], c: 0,
+    f: "Blue Buff – great for champions who cast a lot." },
+  { q: "What is the little creature that walks around your board called?", a: ["A Poro", "A Little Legend", "A Minion", "A Tactician Pet"], c: 1,
+    f: "A Little Legend – like Pengu, River Sprite or Featherknight." },
+  { q: "What is the round called where everyone picks a champion with an item from a spinning circle?", a: ["The Shop", "The Arena", "The Carousel", "The Augment round"], c: 2,
+    f: "The Carousel (also called the shared draft) – lowest health picks first!" },
+  { q: "In which set were Augments first added to TFT?", a: ["Set 1: Faction Wars", "Set 3: Galaxies", "Set 6: Gizmos & Gadgets", "Set 9: Runeterra Reforged"], c: 2,
+    f: "Set 6: Gizmos & Gadgets in 2021 – and they've been in the game ever since." }
 ];
 
 let i = 0, score = 0;
@@ -62,10 +62,10 @@ const app = document.getElementById("app");
 
 function start() {
   app.innerHTML = `
-    <h1>⚡ Harry Potter Quiz: Hard Mode ⚡</h1>
-    <div class="sub">Made for Melih – HARD MODE. Only true wizards survive!</div>
-    <div class="center"><div class="big">🧙‍♂️</div>
-    <p>${questions.length} questions. Good luck!</p>
+    <h1>🐧 Teamfight Tactics Quiz 🐧</h1>
+    <div class="sub">Made for Melih – are you a Challenger player?</div>
+    <div class="center"><div class="big">⚔️</div>
+    <p>${questions.length} questions. GL HF!</p>
     <button class="next" onclick="show()">Start</button></div>`;
 }
 
@@ -95,10 +95,10 @@ function next() { i++; i < questions.length ? show() : result(); }
 
 function result() {
   const pct = score / questions.length;
-  const title = pct === 1 ? "Order of Merlin, First Class! 🏆"
-              : pct >= .7 ? "Excellent wizard! 🦉"
-              : pct >= .4 ? "Good job, keep practising your spells! 🪄"
-              : "Even Neville started somewhere – try again! 🐸";
+  const title = pct === 1 ? "Challenger! You're the best in the lobby! 🏆"
+              : pct >= .7 ? "Diamond – top 4 every game! 💎"
+              : pct >= .4 ? "Gold – solid, keep climbing! 🥇"
+              : "Iron for now – one more game, Melih! 🐧";
   app.innerHTML = `
     <h1>Well done, Melih!</h1>
     <div class="center"><div class="big">${score} / ${questions.length}</div>

@@ -1,3 +1,3 @@
-# Harry Potter Quiz for Melih
+# TFT Quiz for Melih
 
-A small 10-question Harry Potter quiz in English. Open `index.html` in a browser to play.
+A small 12-question Teamfight Tactics quiz in English. Play it at https://bettygshunt.github.io/hp/
