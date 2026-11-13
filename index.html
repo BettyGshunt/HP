@@ -73,7 +73,7 @@ function show() {
   const item = questions[i];
   app.innerHTML = `
     <div class="progress">Question ${i + 1} of ${questions.length} · Score: ${score}</div>
-    <div class="q">${item.q}</div>
+    <div class="q">Melih, ${item.q.charAt(0).toLowerCase() + item.q.slice(1)}</div>
     ${item.a.map((t, k) => `<button class="opt" data-k="${k}">${t}</button>`).join("")}
     <div class="fb" id="fb"></div>
     <div id="nav"></div>`;
