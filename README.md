@@ -1,6 +1,6 @@
 # Quizzes
 
-- The O.C. quiz for Melih: https://bettygshunt.github.io/hp/
-- The O.C. quiz for Mami: https://bettygshunt.github.io/hp/mami-oc/
-- Austin-Healey quiz for Mami: https://bettygshunt.github.io/hp/austin-healey/
-- Escape Room (Harry Potter): https://bettygshunt.github.io/hp/escape-room/
+- The O.C. quiz for Melih: https://bettygshunt.github.io/HP/
+- The O.C. quiz for Mami: https://bettygshunt.github.io/HP/mami-oc/
+- Austin-Healey quiz for Mami: https://bettygshunt.github.io/HP/austin-healey/
+- Escape Room (Harry Potter): https://bettygshunt.github.io/HP/escape-room/
