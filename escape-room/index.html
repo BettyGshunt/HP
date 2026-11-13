@@ -133,9 +133,13 @@ function closeModal(){ $('overlay').style.display='none'; S.open=null; }
 $('closeM').onclick=closeModal; $('overlay').onclick=e=>{ if(e.target.id==='overlay') closeModal(); };
 function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
 function solved(key, el, text){
+  if(S.f[key]) return;                       // each puzzle gives exactly ONE piece
   S.f[key]=true; S.pieces++; $('pc').textContent=`🧩 ${S.pieces}/4`; $('mapBtn').textContent=`🧩 Map pieces (${S.pieces}/4)`;
   if(el) el.classList.add('solved');
   const msg = `${text} 🧩 <b>You got a piece of the map! (${S.pieces}/4)</b>` + (S.pieces===4?' That\'s all four — click "Map pieces" and put the map back together!':'');
+  // replace the puzzle with a locked "solved" screen so nothing can be clicked again
+  const h=document.querySelector('#mbody h2'); const title=h?h.textContent:'Solved';
+  modal(title, `<p>✔ <b>Solved!</b></p><div class="out" id="out"></div>`);
   out(msg); say(msg);
 }
 
@@ -157,9 +161,9 @@ function openPotions(){
       <div class="row">${[0,1,2,3].map(i=>`<div class="bslot">${pour[i]?`<span style="filter:drop-shadow(0 0 8px ${COLORS[pour[i]][0]})">🧪</span><small>${COLORS[pour[i]][1]}</small>`:`<small>${i+1}.</small>`}</div>`).join('')}</div>
       <div class="center"><button class="btn ghost" id="pReset">Start over</button></div><div class="out" id="out"></div>`, 'potion');
     document.querySelectorAll('.bottle').forEach(b=>b.onclick=()=>{
-      const c=b.dataset.c; if(pour.includes(c)) return; pour.push(c);
+      const c=b.dataset.c; if(S.f.potion||pour.includes(c)) return; pour.push(c);
       if(pour.length===4){
-        if(pour.join()===P_SOL.join()){ draw(); solved('potion',$('cauldron'),'✨ The potion turns pure gold! A fireproof scrap of parchment floats up out of the cauldron.'); }
+        if(pour.join()===P_SOL.join()){ solved('potion',$('cauldron'),'✨ The potion turns pure gold! A fireproof scrap of parchment floats up out of the cauldron.'); }
         else { pour=[]; draw(); shake($('modal')); out('💥 POOF! A cloud of purple smoke — your eyebrows are slightly singed. Wrong order! The bottles refill themselves. Read the clues again.'); }
         return;
       }
@@ -175,7 +179,7 @@ function openPortrait(){
   if(S.f.cipher) return modal('🖼️ Phineas Nigellus Black', '<p>The portrait has swung open. The hollow behind it is empty now.</p>');
   modal('🖼️ Phineas Nigellus Black', `<p>The painted wizard sneers: <i>"I hide something of Severus'. I open only for the secret word — and he wrote it so that no dunderhead could read it."</i></p>
     <div class="center"><input class="pw" id="pw" placeholder="Secret word" autocomplete="off"> <button class="btn" id="pwGo">Say it</button></div><div class="out" id="out"></div>`, 'cipher');
-  const go=()=>{ const v=$('pw').value.trim().toLowerCase();
+  const go=()=>{ if(S.f.cipher) return; const v=$('pw').value.trim().toLowerCase();
     if(v==='phoenix'){ $('portrait').classList.add('solved'); modal('🖼️ Phineas Nigellus Black','<p><i>"Hmph. PHOENIX. Correct... how tiresome."</i> The portrait swings open like a little door.</p><div class="out" id="out"></div>'); solved('cipher',null,'Behind the portrait is a small hollow in the wall.'); }
     else { shake($('modal')); out(`<i>"${v?v.toUpperCase()+'? ':''}Wrong! Off with you."</i>`); } };
   $('pwGo').onclick=go; $('pw').onkeydown=e=>{ if(e.key==='Enter') go(); }; setTimeout(()=>{ const e=$('pw'); if(e) e.focus(); },50);
@@ -202,7 +206,7 @@ function openDrawer(){
       What am I?"</div>
     ${dialHTML(dr,digits,'dr')}<div class="center"><button class="btn" id="tryDr">Pull the drawer</button></div><div class="out" id="out"></div>`, 'number');
   wireDials(dr,digits,'dr');
-  $('tryDr').onclick=()=>{ if(dr.join('')==='194'){ $('desk').classList.add('solved'); solved('number',null,'Click! The drawer slides open.'); } else { shake($('modal')); out('It won\'t budge. Read the riddle again, line by line.'); } };
+  $('tryDr').onclick=()=>{ if(S.f.number) return; if(dr.join('')==='194'){ $('desk').classList.add('solved'); solved('number',null,'Click! The drawer slides open.'); } else { shake($('modal')); out('It won\'t budge. Read the riddle again, line by line.'); } };
 }
 
 // ================= PUZZLE 4: RUNE LIGHTS (rug / flagstone) =================
@@ -218,7 +222,7 @@ function openRunes(){
       <div class="paper">Scratched next to it: <i>"Wake every rune, and the stone will let you pass. But careful — each rune you touch also wakes or puts to sleep its neighbours above, below, left and right."</i></div>
       <div class="runes">${runes.map((on,i)=>`<div class="rune${on?' on':''}" data-r="${i}">${RUNE_CH[i]}</div>`).join('')}</div>
       <p class="center small">Moves: ${runeMoves} &nbsp; <button class="btn ghost" id="rReset">Start over</button></p><div class="out" id="out"></div>`, 'runes');
-    document.querySelectorAll('.rune').forEach(el=>el.onclick=()=>{ press(runes,+el.dataset.r); runeMoves++; draw();
+    document.querySelectorAll('.rune').forEach(el=>el.onclick=()=>{ if(S.f.runes) return; press(runes,+el.dataset.r); runeMoves++; draw();
       if(runes.every(x=>x)){ $('rug').classList.add('solved'); solved('runes',null,'All nine runes blaze blue! GRRRIND... the flagstone slides aside, revealing a small hollow.'); } });
     $('rReset').onclick=()=>{ runes=[...runeStart]; runeMoves=0; draw(); };
   };
