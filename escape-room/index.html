@@ -131,7 +131,7 @@
   <div class="hot" id="chair" data-o="chair">🪑<div class="label">Chair</div></div>
 </div>
 
-<div id="msg">Melih, you've been locked in Professor Snape's dungeon after detention! The door is sealed with a strange lock of four symbols. Search the room, collect what you find and escape before Snape returns...</div>
+<div id="msg">You've been locked in Professor Snape's dungeon after detention! The door is sealed with a strange lock of four symbols. Search the room, collect what you find and escape before Snape returns...</div>
 <div id="selhint"></div>
 <div id="inv"></div>
 
@@ -213,7 +213,7 @@ const OBJ = {
   jar(){ say('A jar of pickled... something. It has eyes. 🤢 There\'s nothing useful in it — and you\'re NOT putting your hand in there.'); },
   chair(){ say('Snape\'s chair. Someone has carved "S.S. ❤ L.E." into the underside. How... unexpected. Nothing else here.'); },
   window(){ say('A high, barred window. Outside you can see the Black Lake glowing in the moonlight. A giant squid waves a tentacle. No way out here.'); },
-  blackboard(){ say('The blackboard says: <b>"Reminder to self: drawer combination = the number of Potter\'s vault at Gringotts."</b> Hmm... do you remember it, Melih?'); },
+  blackboard(){ say('The blackboard says: <b>"Reminder to self: drawer combination = the number of Potter\'s vault at Gringotts."</b> Hmm... do you remember it?'); },
   fireplace(){
     if(S.sel==='parchment'){ return say('You hold the parchment near the fire, but it\'s too hot — you nearly burn your fingers! Maybe a smaller flame would work better.'); }
     if(!S.f.key){ S.f.key=true; add('key'); say('You poke around in the ashes at the edge of the fire... something glints! You pull out a small <b>silver key</b>. 🗝️'); }
@@ -397,7 +397,7 @@ function checkPuzzle(){
 }
 function showSolved(){
   document.querySelectorAll('.slot').forEach(s=>s.style.border='2px solid #e8c547');
-  $('pzOut').innerHTML='<p style="color:#e8c547"><b>✨ The map is whole again! Remember these four signs, Melih.</b></p>';
+  $('pzOut').innerHTML='<p style="color:#e8c547"><b>✨ The map is whole again! Remember these four signs!</b></p>';
 }
 
 // ---------------- HINTS ----------------
@@ -425,7 +425,7 @@ const fmt=ms=>{ const s=Math.floor(ms/1000); return String(Math.floor(s/60)).pad
 setInterval(()=>{ if(!S.done) $('timer').textContent=fmt(Date.now()-S.start); },1000);
 function win(){
   S.done=true; const t=fmt(Date.now()-S.start);
-  modal('🎉 You escaped, Melih!', `<div class="center"><div style="font-size:4rem">🚪✨🧙‍♂️</div>
+  modal('🎉 You escaped!', `<div class="center"><div style="font-size:4rem">🚪✨🧙‍♂️</div>
     <p>The four symbols blaze with golden light and the heavy door swings open. You sprint up the dungeon stairs just as you hear Snape's footsteps behind you...</p>
     <p style="font-size:1.4rem;color:#e8c547"><b>Escape time: ${t}</b></p>
     <p><i>"Fifty points to Gryffindor!" — Dumbledore, probably.</i></p>
