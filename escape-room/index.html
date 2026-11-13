@@ -6,495 +6,312 @@
 <title>Escape from Snape's Dungeon</title>
 <style>
   * { box-sizing: border-box; }
-  body { margin:0; background:#07060c; color:#efe6c8; font-family: Georgia, "Times New Roman", serif;
-         display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+  body { margin:0; background:#07060c; color:#efe6c8; font-family: Georgia, "Times New Roman", serif; display:flex; flex-direction:column; align-items:center; min-height:100vh; }
   header { width:min(98vw,1100px); display:flex; justify-content:space-between; align-items:center; padding:10px 4px; gap:10px; flex-wrap:wrap; }
   header h1 { font-size:1.3rem; margin:0; color:#e8c547; }
-  .hud { display:flex; gap:10px; align-items:center; }
-  .btn { background:#c9a227; color:#1b1433; border:none; border-radius:8px; padding:7px 14px; font:inherit; font-weight:bold; cursor:pointer; }
+  .hud { display:flex; gap:12px; align-items:center; }
+  .btn { background:#c9a227; color:#1b1433; border:none; border-radius:8px; padding:8px 16px; font:inherit; font-weight:bold; cursor:pointer; }
   .btn.ghost { background:transparent; color:#e8c547; border:1px solid #c9a227; }
-  #timer, #pc { font-variant-numeric: tabular-nums; opacity:.85; }
+  #timer, #pc { font-variant-numeric: tabular-nums; opacity:.9; }
 
-  /* ---------- ROOM ---------- */
-  #stage { position:relative; width:min(98vw,1100px); aspect-ratio: 16/9; border:2px solid #4a3d1e; border-radius:12px; overflow:hidden; cursor:pointer;
-           background: linear-gradient(180deg, #1d2a24 0%, #16201b 60%, #2b2116 60%, #1a130c 100%); user-select:none; }
-  #stage::before { content:""; position:absolute; inset:0 0 40% 0;
-    background-image: linear-gradient(90deg, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(rgba(0,0,0,.25) 1px, transparent 1px);
-    background-size: 60px 30px; opacity:.6; pointer-events:none; }
-  #stage::after { content:""; position:absolute; inset:0; pointer-events:none;
-    background: radial-gradient(ellipse at 30% 55%, rgba(255,140,40,.12), transparent 45%), radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.65)); }
-  .hot { position:absolute; transition: filter .15s; }
-  .hot:hover { filter: brightness(1.15); }
+  /* ROOM */
+  #stage { position:relative; width:min(98vw,1100px); aspect-ratio:16/9; border:2px solid #4a3d1e; border-radius:12px; overflow:hidden; user-select:none;
+           background: linear-gradient(180deg,#1d2a24 0%,#16201b 60%,#2b2116 60%,#1a130c 100%); }
+  #stage::before { content:""; position:absolute; inset:0 0 40% 0; background-image: linear-gradient(90deg, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(rgba(0,0,0,.25) 1px, transparent 1px); background-size:60px 30px; opacity:.6; pointer-events:none; }
+  #stage::after { content:""; position:absolute; inset:0; pointer-events:none; background: radial-gradient(ellipse at 30% 55%, rgba(255,140,40,.12), transparent 45%), radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.65)); }
+  .hot { position:absolute; cursor:pointer; transition: filter .15s; }
+  .hot:hover { filter: brightness(1.3) drop-shadow(0 0 6px rgba(232,197,71,.55)); }
+  .solved::before { content:"✔"; position:absolute; top:-6px; right:-6px; z-index:3; background:#2e9e55; color:#fff; border-radius:50%; width:22px; height:22px; font-size:13px; display:flex; align-items:center; justify-content:center; font-family:sans-serif; }
+  .tag { position:absolute; left:50%; bottom:-20px; transform:translateX(-50%); font-size:.7rem; white-space:nowrap; background:rgba(0,0,0,.65); padding:1px 6px; border-radius:4px; pointer-events:none; }
 
-  #bookshelf { left:2%; top:7%; width:16%; height:60%; background:#3b2414; border:6px solid #24150b; border-radius:4px; display:grid; grid-template-rows: repeat(4,1fr); padding:4px; gap:4px; }
+  #bookshelf { left:2%; top:7%; width:16%; height:60%; background:#3b2414; border:6px solid #24150b; border-radius:4px; display:grid; grid-template-rows:repeat(4,1fr); padding:4px; gap:4px; }
   #bookshelf .row { border-bottom:5px solid #24150b; display:flex; align-items:flex-end; gap:2px; padding:0 3px; }
   #bookshelf .bk { width:9%; border-radius:2px 2px 0 0; }
-  #portrait { left:22%; top:8%; width:10%; height:24%; background: linear-gradient(#2c3b2a,#1a2419); border:7px solid #a8862a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:3rem; }
-  #blackboard { left:36%; top:8%; width:22%; height:20%; background:#1f2b22; border:8px solid #5a3b1c; border-radius:4px; color:#dfe9dd; font-size:.75rem; padding:6px; font-family: "Comic Sans MS", cursive; line-height:1.3; }
-  #window { left:62%; top:8%; width:10%; height:22%; background: radial-gradient(circle at 70% 30%, #f5f1c8 0 9%, #23365a 10%, #0b1424); border:6px solid #3a3a3a; border-radius:50% 50% 4px 4px; }
-  #window::after { content:""; position:absolute; inset:0; background: linear-gradient(90deg, transparent 47%, #3a3a3a 47% 53%, transparent 53%), linear-gradient(transparent 47%, #3a3a3a 47% 53%, transparent 53%); }
+  #portrait { left:22%; top:8%; width:10%; height:24%; background:linear-gradient(#2c3b2a,#1a2419); border:7px solid #a8862a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:3rem; }
+  #blackboard { left:36%; top:7%; width:23%; height:23%; background:#1f2b22; border:8px solid #5a3b1c; border-radius:4px; color:#dfe9dd; font-size:.8rem; padding:6px 8px; font-family:"Comic Sans MS",cursive; line-height:1.35; }
+  #blackboard b { letter-spacing:3px; font-size:1rem; }
+  #window { left:63%; top:8%; width:9%; height:21%; background: radial-gradient(circle at 70% 30%, #f5f1c8 0 9%, #23365a 10%, #0b1424); border:6px solid #3a3a3a; border-radius:50% 50% 4px 4px; }
+  #window::after { content:""; position:absolute; inset:0; background: linear-gradient(90deg,transparent 47%,#3a3a3a 47% 53%,transparent 53%), linear-gradient(transparent 47%,#3a3a3a 47% 53%,transparent 53%); }
   #fireplace { left:21%; top:36%; width:16%; height:28%; background:#2a2a2a; border:8px solid #4b4b4b; border-bottom:none; border-radius:6px 6px 0 0; display:flex; align-items:flex-end; justify-content:center; font-size:2.6rem; }
-  .flame { animation: flicker 1.2s infinite alternate; display:inline-block; }
-  @keyframes flicker { from { transform: scale(1); opacity:.9 } to { transform: scale(1.08) translateY(-2px); opacity:1 } }
+  .flame { display:inline-block; animation: flicker 1.2s infinite alternate; }
+  @keyframes flicker { from{transform:scale(1);opacity:.9} to{transform:scale(1.08) translateY(-2px);opacity:1} }
   #cauldron { left:42%; top:44%; width:12%; height:22%; display:flex; align-items:flex-end; justify-content:center; }
-  #cauldron .pot { width:100%; height:70%; background: radial-gradient(ellipse at 50% 15%, #3b6b3b 0 30%, #111 32%); border-radius: 10% 10% 50% 50%; border:4px solid #2b2b2b; position:relative; }
-  #cauldron.gold .pot { background: radial-gradient(ellipse at 50% 15%, #e8c547 0 30%, #111 32%); }
-  #cauldron .pot::before { content:"~ ~ ~"; position:absolute; top:-26px; left:0; right:0; text-align:center; color:#9fd59f; font-size:1rem; opacity:.6; animation: steam 2s infinite; }
-  @keyframes steam { from { transform: translateY(4px); opacity:.2 } to { transform: translateY(-8px); opacity:.7 } }
-  #cabinet { left:65%; top:31%; width:12%; height:36%; background: linear-gradient(90deg,#4a2f1a 49%, #2a190c 49% 51%, #4a2f1a 51%); border:5px solid #2a190c; border-radius:4px; }
-  #door { left:81%; top:16%; width:16%; height:52%; background: repeating-linear-gradient(90deg,#3d2a17 0 18px,#33230f 18px 20px); border:7px solid #1c140a; border-radius: 50% 50% 0 0 / 22% 22% 0 0; }
-  #door::after { content:"✦ ✦ ✦ ✦"; position:absolute; top:42%; left:0; right:0; text-align:center; color:#c9a227; font-size:.9rem; }
+  #cauldron .pot { width:100%; height:70%; background: radial-gradient(ellipse at 50% 15%, #3b6b3b 0 30%, #111 32%); border-radius:10% 10% 50% 50%; border:4px solid #2b2b2b; position:relative; }
+  #cauldron.solved .pot { background: radial-gradient(ellipse at 50% 15%, #e8c547 0 30%, #111 32%); }
+  #cauldron .pot::after { content:"~ ~ ~"; position:absolute; top:-26px; left:0; right:0; text-align:center; color:#9fd59f; font-size:1rem; opacity:.6; animation: steam 2s infinite; }
+  @keyframes steam { from{transform:translateY(4px);opacity:.2} to{transform:translateY(-8px);opacity:.7} }
+  #shelf { left:63%; top:33%; width:14%; height:12%; background:#3a2414; border-bottom:6px solid #24150b; display:flex; align-items:flex-end; justify-content:space-around; font-size:1.7rem; }
+  #door { left:81%; top:16%; width:16%; height:52%; background: repeating-linear-gradient(90deg,#3d2a17 0 18px,#33230f 18px 20px); border:7px solid #1c140a; border-radius:50% 50% 0 0 / 22% 22% 0 0; }
+  #door::after { content:"❄ ❄ ❄ ❄"; position:absolute; top:42%; left:0; right:0; text-align:center; color:#9fd0ff; font-size:.9rem; }
+  #door.thawed::after { content:"✦ ✦ ✦ ✦"; color:#c9a227; }
   #desk { left:36%; top:74%; width:28%; height:20%; background: linear-gradient(#5b3a1e 0 22%, #3f2713 22%); border-radius:4px; display:flex; align-items:center; justify-content:center; }
-  #desk .drawer { width:34%; height:36%; margin-top:14%; border:3px solid #26170a; background:#4a2f17; border-radius:3px; }
-  #rug { left:6%; top:80%; width:26%; height:15%; background: repeating-linear-gradient(45deg,#5a1a1a 0 10px,#7a2a1f 10px 20px); border:4px solid #c9a227; border-radius:6px; transform: perspective(300px) rotateX(35deg); }
+  #desk .drawer { width:34%; height:36%; margin-top:14%; border:3px solid #26170a; background:#4a2f17; border-radius:3px; text-align:center; font-size:.85rem; padding-top:2px; }
+  #rug { left:6%; top:79%; width:26%; height:16%; background: repeating-linear-gradient(45deg,#5a1a1a 0 10px,#7a2a1f 10px 20px); border:4px solid #c9a227; border-radius:6px; transform: perspective(300px) rotateX(35deg); }
   #jar { left:12%; top:69%; width:5%; height:10%; font-size:2rem; }
   #chair { left:68%; top:72%; width:9%; height:20%; font-size:3.4rem; display:flex; align-items:flex-end; justify-content:center; }
 
-  /* ---------- MESSAGE + INVENTORY ---------- */
   #msg { width:min(98vw,1100px); min-height:52px; margin-top:8px; padding:10px 14px; background:#15111f; border:1px solid #4a3d1e; border-radius:10px; font-style:italic; }
-  #inv { width:min(98vw,1100px); display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 20px; min-height:76px; padding:8px; background:#100d18; border:1px solid #4a3d1e; border-radius:10px; }
-  #inv .empty { opacity:.5; font-style:italic; align-self:center; padding-left:6px; }
-  .item { width:80px; height:62px; background:#221a35; border:2px solid #4b3d6e; border-radius:8px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:1.6rem; }
-  .item small { font-size:.55rem; text-align:center; line-height:1.05; margin-top:2px; }
-  .item.sel { border-color:#e8c547; box-shadow:0 0 10px #e8c547; }
-  .selhint { opacity:.75; font-size:.85rem; text-align:right; min-height:1.1em; }
+  #bar { width:min(98vw,1100px); display:flex; gap:10px; align-items:center; margin:8px 0 20px; }
 
-  /* ---------- MODAL / VIEWS ---------- */
+  /* MODAL */
   #overlay { position:fixed; inset:0; background:rgba(0,0,0,.78); display:none; align-items:center; justify-content:center; z-index:10; }
-  #modal { background:#1b1433; border:2px solid #c9a227; border-radius:14px; padding:18px; width:min(96vw,760px); max-height:96vh; overflow:auto; position:relative; }
-  #modal h2 { margin:0 0 10px; color:#e8c547; font-size:1.25rem; }
+  #modal { background:#1b1433; border:2px solid #c9a227; border-radius:14px; padding:20px; width:min(96vw,680px); max-height:96vh; overflow:auto; position:relative; }
+  #modal h2 { margin:0 0 10px; color:#e8c547; font-size:1.3rem; }
   #closeM { position:absolute; top:8px; right:12px; background:none; border:none; color:#e8c547; font-size:1.4rem; cursor:pointer; }
-  .scene { position:relative; width:100%; aspect-ratio: 16/10; border-radius:10px; overflow:hidden; cursor:pointer; user-select:none; border:1px solid #4a3d1e; }
-  .hs { position:absolute; display:flex; align-items:center; justify-content:center; }
-  .vmsg { margin-top:10px; padding:9px 12px; background:#120e1d; border:1px solid #4a3d1e; border-radius:8px; font-style:italic; min-height:44px; }
-  #modalInv { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
-  #modalInv .item { width:70px; height:56px; font-size:1.3rem; }
-  .paper { background:#efe2b8; color:#3b2a14; padding:12px 14px; border-radius:6px; margin-top:8px; font-style:italic; line-height:1.45; }
+  .paper { background:#efe2b8; color:#3b2a14; padding:12px 16px; border-radius:6px; margin:10px 0; font-style:italic; line-height:1.5; }
+  .out { margin-top:10px; padding:9px 12px; background:#120e1d; border:1px solid #4a3d1e; border-radius:8px; font-style:italic; min-height:42px; }
+  .center { text-align:center; }
+  .small { font-size:.85rem; opacity:.8; }
+  .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:10px 0; }
+  input.pw { font:inherit; padding:9px 12px; border-radius:8px; border:1px solid #5b4b8a; background:#0f0b1c; color:#efe6c8; width:60%; text-transform:uppercase; letter-spacing:2px; }
+
+  .bottle { width:70px; height:96px; border-radius:10px; border:2px solid #5b4b8a; background:#221a35; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:2.2rem; }
+  .bottle small { font-size:.65rem; }
+  .bottle.used { opacity:.25; cursor:default; }
+  .bslot { width:70px; height:96px; border:2px dashed #c9a227; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:2.2rem; }
+  .bslot small { font-size:.65rem; color:#c9a227; }
+
   .dials { display:flex; gap:14px; justify-content:center; margin:14px 0; }
   .dial { display:flex; flex-direction:column; align-items:center; gap:4px; }
   .dial button { background:#2a2050; color:#e8c547; border:1px solid #5b4b8a; border-radius:6px; width:52px; cursor:pointer; font-size:1rem; }
   .dial .face { width:62px; height:62px; background:#0f0b1c; border:2px solid #c9a227; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:2rem; }
-  .center { text-align:center; }
-  input.pw { font:inherit; padding:8px 10px; border-radius:8px; border:1px solid #5b4b8a; background:#0f0b1c; color:#efe6c8; width:65%; }
-  .small { font-size:.85rem; opacity:.8; }
-  .pgrid { display:grid; grid-template-columns: repeat(3, 120px); grid-template-rows: repeat(2,120px); gap:3px; justify-content:center; background:#0f0b1c; padding:6px; border-radius:8px; width:max-content; margin:0 auto; }
-  .slot { width:120px; height:120px; border:2px dashed #4b3d6e; border-radius:4px; display:flex; align-items:center; justify-content:center; }
-  .piece { width:116px; height:116px; background-size:cover; cursor:pointer; border-radius:3px; transition: transform .2s; box-shadow:0 2px 6px rgba(0,0,0,.6); }
+
+  .runes { display:grid; grid-template-columns:repeat(3,84px); gap:8px; justify-content:center; margin:14px auto; }
+  .rune { width:84px; height:84px; border-radius:12px; border:2px solid #444; background:#2a2a2a; color:#555; font-size:2.4rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s; }
+  .rune.on { background:#2b3f6b; color:#9fd0ff; border-color:#9fd0ff; box-shadow:0 0 16px #5fa8ff; }
+
+  .pgrid { display:grid; grid-template-columns:repeat(2,150px); grid-template-rows:repeat(2,150px); gap:3px; justify-content:center; background:#0f0b1c; padding:6px; border-radius:8px; width:max-content; margin:0 auto; }
+  .slot { width:150px; height:150px; border:2px dashed #4b3d6e; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+  .piece { width:146px; height:146px; background-size:cover; cursor:pointer; border-radius:3px; transition: transform .2s; box-shadow:0 2px 6px rgba(0,0,0,.6); }
   .piece.sel { outline:3px solid #e8c547; }
-  .tray { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; min-height:124px; margin-top:12px; padding:6px; border:1px solid #4b3d6e; border-radius:8px; }
+  .tray { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; min-height:154px; margin-top:12px; padding:6px; border:1px solid #4b3d6e; border-radius:8px; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
   .shake { animation: shake .3s 2; }
-  @media (max-width:520px){ .pgrid{ grid-template-columns: repeat(3, 90px); grid-template-rows: repeat(2,90px);} .slot{width:90px;height:90px} .piece{width:86px;height:86px} }
+  @media (max-width:520px){ .pgrid{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(2,120px)} .slot{width:120px;height:120px} .piece{width:116px;height:116px} .runes{grid-template-columns:repeat(3,70px)} .rune{width:70px;height:70px} }
 </style>
 </head>
 <body>
 <header>
   <h1>⚡ Escape from Snape's Dungeon</h1>
-  <div class="hud"><span id="pc">🧩 0/6</span><span id="timer">00:00</span><button class="btn ghost" id="hintBtn">🦉 Hint</button></div>
+  <div class="hud"><span id="pc">🧩 0/4</span><span id="timer">00:00</span><button class="btn ghost" id="hintBtn">🦉 Hint</button></div>
 </header>
 
 <div id="stage">
   <div class="hot" id="bookshelf" data-o="bookshelf"><div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div></div>
-  <div class="hot" id="portrait" data-o="portrait">🧔</div>
-  <div class="hot" id="blackboard" data-o="blackboard">Homework: 12 inches on bezoars.<br><br>"My drawer remembers the vault where the Boy Who Lived kept his gold."<br>— S.S.</div>
+  <div class="hot" id="portrait" data-o="portrait">🧔<span class="tag">Portrait</span></div>
+  <div class="hot" id="blackboard" data-o="blackboard">Rule of three: every letter<br>must take three steps back.<br><b>SKRHQLA</b></div>
   <div class="hot" id="window" data-o="window"></div>
-  <div class="hot" id="fireplace" data-o="fireplace"><span class="flame" id="mainFire">🔥</span></div>
-  <div class="hot" id="cabinet" data-o="cabinet"></div>
-  <div class="hot" id="door" data-o="door"></div>
-  <div class="hot" id="cauldron" data-o="cauldron"><div class="pot"></div></div>
-  <div class="hot" id="desk" data-o="desk"><div class="drawer"></div></div>
+  <div class="hot" id="fireplace" data-o="fireplace"><span class="flame">🔥</span></div>
+  <div class="hot" id="shelf" data-o="cauldron"><span>🧪</span><span>🧪</span><span>🧪</span><span>🧪</span></div>
+  <div class="hot" id="cauldron" data-o="cauldron"><div class="pot"></div><span class="tag">Cauldron</span></div>
+  <div class="hot" id="door" data-o="door"><span class="tag">Door</span></div>
+  <div class="hot" id="desk" data-o="desk"><div class="drawer">🔢</div><span class="tag">Drawer</span></div>
   <div class="hot" id="rug" data-o="rug"></div>
   <div class="hot" id="jar" data-o="jar">🫙</div>
   <div class="hot" id="chair" data-o="chair">🪑</div>
 </div>
 
-<div id="msg">You've been locked in Professor Snape's dungeon after detention! The door is sealed by a magical lock, and six torn pieces of an old map are hidden somewhere in this room. Every piece is guarded by a puzzle. Look closely at everything — Snape hides things well.</div>
-<div class="selhint" id="selhint" style="width:min(98vw,1100px)"></div>
-<div id="inv"></div>
+<div id="msg">You've been locked in Professor Snape's dungeon after detention! The door is frozen shut by a spell. Snape tore his secret map into <b>four pieces</b> and hid each one behind a different puzzle. Solve them, rebuild the map, and it will tell you how to open the door.</div>
+<div id="bar"><button class="btn ghost" id="mapBtn">🧩 Map pieces (0/4)</button><span class="small" id="status"></span></div>
 
 <div id="overlay"><div id="modal"><button id="closeM">✕</button><div id="mbody"></div></div></div>
 
 <script>
-// ---------------- RANDOMISED PER GAME ----------------
-const SYMS = ['⚡','🦉','🐍','🦁','🦡','🦅'];
-const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
-const CODE = Array.from({length:4},()=>SYMS[Math.floor(Math.random()*SYMS.length)]);
-const FLAG_ORDER = shuffle(['🦁','🦡','🦅','🐍']);
-const ANIMAL = { '🦁':'the lion', '🦡':'the badger', '🦅':'the eagle', '🐍':'the serpent' };
-const POTION_ORDER = ['red','yellow','blue','green'];
-
-// ---------------- STATE ----------------
-const S = { inv:[], sel:null, pieces:0, f:{}, potionSeq:[], flagSeq:[], drawer:[0,0,0], door:[0,0,0,0], puzzle:[], start:Date.now(), done:false, view:null, hint:{} };
-const ITEMS = {
-  jug:      { icon:'🏺', name:'Jug of rainwater', desc:'A small stone jug, full of cold rainwater.' },
-  key:      { icon:'🗝️', name:'Silver key', desc:'A small silver key, still warm from the ashes. It looks like it fits a cupboard.' },
-  red:      { icon:'🧪', name:'Red essence', desc:'Glowing red liquid. Label: "Essence of Courage".', color:'#d33' },
-  yellow:   { icon:'🧪', name:'Yellow essence', desc:'Warm yellow liquid. Label: "Essence of Loyalty".', color:'#e8c547' },
-  blue:     { icon:'🧪', name:'Blue essence', desc:'Deep blue liquid. Label: "Essence of Wisdom".', color:'#3b6fd8' },
-  green:    { icon:'🧪', name:'Green essence', desc:'Shimmering green liquid. Label: "Essence of Ambition".', color:'#2e9e55' },
-  gloves:   { icon:'🧤', name:'Dragon-hide gloves', desc:'Thick dragon-hide gloves. Perfect for touching things you really don\'t want to touch.' },
-  brass:    { icon:'🔑', name:'Tiny brass key', desc:'A tiny brass key, slimy from the jar. Too small for a door — maybe a padlock on something small?' },
-  candle:   { icon:'🕯️', name:'Candle', desc:'A lit candle with a small, gentle flame.' },
-  parchment:{ icon:'📜', name:'Blank parchment', desc:'A completely blank piece of parchment. It feels slightly waxy... as if something is hidden in it.' },
-  secret:   { icon:'📜', name:'Revealed parchment', desc:'Brown letters appeared in the warmth: "Phineas keeps a piece for me. His password is the one Harry used for Gryffindor Tower in his fifth year — a strange cactus-like plant Neville loves."' },
-  pieces:   { icon:'🧩', name:'Map pieces', desc:'Torn pieces of an old map.' }
-};
-
-document.querySelectorAll('#bookshelf .row').forEach((r,ri) => {
-  const cols = ['#7a1f1f','#1f4a7a','#2e6b3a','#7a5a1f','#4a1f6b','#6b3a1f','#2a2a5a'];
-  for (let i=0;i<8;i++){ const b=document.createElement('div'); b.className='bk'; b.style.height=(55+((i*37+ri*13)%40))+'%'; b.style.background=cols[(i+ri*3)%7]; r.appendChild(b); }
-});
-
-// ---------------- HELPERS ----------------
 const $ = id => document.getElementById(id);
-function say(t){ $('msg').innerHTML=t; const v=$('vmsg'); if(v) v.innerHTML=t; }
-const has = id => S.inv.includes(id);
-function add(id){ if(id==='piece'){ S.pieces++; if(!has('pieces')) S.inv.push('pieces'); $('pc').textContent=`🧩 ${S.pieces}/6`; } else if(!has(id)) S.inv.push(id); renderInv(); }
-function remove(id){ S.inv=S.inv.filter(x=>x!==id); if(S.sel===id) S.sel=null; renderInv(); }
-function invHTML(){
-  if(!S.inv.length) return '<span class="empty small" style="opacity:.5">Your pockets are empty.</span>';
-  return S.inv.map(id=>{ const it=ITEMS[id]; const label=id==='pieces'?`Map pieces (${S.pieces}/6)`:it.name;
-    return `<div class="item${S.sel===id?' sel':''}" data-i="${id}"><span style="${it.color?`filter:drop-shadow(0 0 6px ${it.color})`:''}">${it.icon}</span><small>${label}</small></div>`; }).join('');
-}
-function renderInv(){
-  $('inv').innerHTML=invHTML(); const mi=$('modalInv'); if(mi) mi.innerHTML=invHTML();
-  document.querySelectorAll('.item').forEach(d=>d.onclick=e=>{ e.stopPropagation(); clickItem(d.dataset.i); });
-  const t = S.sel ? `Holding: ${ITEMS[S.sel].name} — click where you want to use it (click it again to look at it).` : '';
-  $('selhint').textContent=t; const ms=$('mSel'); if(ms) ms.textContent=t;
-}
-function clickItem(id){
-  if(id==='pieces'){ S.sel=null; openPuzzle(); return; }
-  if(S.sel && S.sel!==id){
-    if([S.sel,id].sort().join()==='candle,parchment'){
-      remove('parchment'); add('secret'); S.sel=null; renderInv();
-      return say('You hold the parchment close to the candle flame... slowly, brown letters appear! 📜 (Click the revealed parchment twice to read it.)');
-    }
-    S.sel=id; renderInv(); return say(`You take out the ${ITEMS[id].name}.`);
-  }
-  if(S.sel===id){ S.sel=null; renderInv(); return say(`<b>${ITEMS[id].name}:</b> ${ITEMS[id].desc}`); }
-  S.sel=id; renderInv(); say(`You take out the ${ITEMS[id].name}.`);
-}
-function openModal(title, html){ $('mbody').innerHTML=`<h2>${title}</h2>${html}`; $('overlay').style.display='flex'; renderInv(); }
-function closeModal(){ $('overlay').style.display='none'; S.view=null; $('mbody').innerHTML=''; renderInv(); }
-$('closeM').onclick=closeModal;
-$('overlay').onclick=e=>{ if(e.target.id==='overlay') closeModal(); };
-function shake(el){ if(!el) return; el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
-function gotPiece(where){ add('piece'); say(`🧩 You found a torn piece of the map ${where}! (${S.pieces}/6)` + (S.pieces===6?' That\'s all six — click "Map pieces" to put the map back together!':'')); }
-const pick = arr => arr[Math.floor(Math.random()*arr.length)];
-const NOTHING = ['Nothing interesting there.','Just cold, damp stone.','You search carefully... nothing.','Only dust and cobwebs.','Hmm, nothing useful here.'];
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const SYMS = ['⚡','🦉','🐍','🦁','🦡','🦅'];
+const CODE = Array.from({length:4},()=>SYMS[Math.floor(Math.random()*SYMS.length)]);
+const S = { pieces:0, f:{}, start:Date.now(), done:false, hints:0, hintLvl:{}, open:null };
 
-// ---------------- VIEW SYSTEM ----------------
-// a view = { title, bg, spots:[{x,y,w,h,html,click}], below:html }
-function showView(name){
-  S.view=name; const v=VIEWS[name]();
-  const keepMsg = $('vmsg') ? $('vmsg').innerHTML : '';
-  openModal(v.title, `<div class="scene" id="scene" style="background:${v.bg}">${v.spots.map((s,i)=>`<div class="hs" data-s="${i}" style="left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h}%;${s.style||''}">${s.html||''}</div>`).join('')}</div>
-    ${v.below||''}<div class="vmsg" id="vmsg">${v.intro||keepMsg||'Click to search.'}</div><div class="selhint" id="mSel"></div><div id="modalInv"></div>`);
-  $('scene').onclick=()=>{ say(S.sel?`Using the ${ITEMS[S.sel].name} there does nothing.`:pick(NOTHING)); };
-  document.querySelectorAll('.hs').forEach(el=>el.onclick=e=>{ e.stopPropagation(); v.spots[+el.dataset.s].click(); });
-  if(v.after) v.after();
-}
-const refresh = () => { const m=$('vmsg').innerHTML; showView(S.view); $('vmsg').innerHTML=m; };
+document.querySelectorAll('#bookshelf .row').forEach((r,ri)=>{ const cols=['#7a1f1f','#1f4a7a','#2e6b3a','#7a5a1f','#4a1f6b','#6b3a1f','#2a2a5a'];
+  for(let i=0;i<8;i++){ const b=document.createElement('div'); b.className='bk'; b.style.height=(55+((i*37+ri*13)%40))+'%'; b.style.background=cols[(i+ri*3)%7]; r.appendChild(b); } });
 
-const VIEWS = {
-  window: () => ({
-    title:'🪟 The Window', bg:'linear-gradient(#0b1424 0 68%, #4b4b4b 68% 76%, #2a2a2a 76%)',
-    intro:'A high, barred window. Rain is dripping through the bars onto the stone windowsill. Outside, the Black Lake glows in the moonlight.',
-    spots:[
-      { x:30,y:4,w:40,h:62, style:'background:linear-gradient(90deg,transparent 30%,#333 30% 33%,transparent 33% 64%,#333 64% 67%,transparent 67%);border:6px solid #333;border-radius:40% 40% 0 0', html:'<span style="font-size:1.4rem;opacity:.6">🌧️</span>', click:()=>say('Cold rain blows through the bars. Far away, the giant squid waves a tentacle. No way out here.') },
-      { x:72,y:4,w:10,h:14, html:'<span style="font-size:1.6rem">🌕</span>', click:()=>say('A full moon. Lupin is probably having a terrible night.') },
-      ...(!S.f.jug ? [{ x:83,y:60,w:7,h:12, html:'<span style="font-size:1.5rem;filter:brightness(.55)">🏺</span>', click:()=>{ S.f.jug=true; add('jug'); say('Tucked in the dark corner of the sill is a small stone jug. Rain has been dripping into it — it\'s full of water! You take it. 🏺'); refresh(); } }] : []),
-      { x:10,y:70,w:12,h:10, html:'<span style="font-size:1rem;opacity:.5">💧💧</span>', click:()=>say('Puddles of rainwater on the windowsill. Too shallow to scoop up.') }
-    ]
-  }),
-  fireplace: () => {
-    const lit=!S.f.fireOut;
-    return { title:'🔥 The Fireplace', bg:'linear-gradient(#3a3a3a,#262626)',
-      intro: lit ? 'A roaring fire. You can feel the heat from here. Behind the flames, the back wall is made of old soot-black bricks.' : 'The fire is out. Smoke still curls up from the wet ashes.',
-      spots:[
-        { x:0,y:0,w:100,h:55, style:'background-image:linear-gradient(90deg,rgba(0,0,0,.5) 2px,transparent 2px),linear-gradient(rgba(0,0,0,.5) 2px,transparent 2px);background-size:60px 28px', click:()=>say(lit?'The bricks behind the fire are far too hot to touch.':'Rows of old sooty bricks. Look closely — are they all the same?') },
-        ...(!lit && !S.f.brick ? [{ x:61,y:28,w:9,h:9, style:'background:rgba(60,45,35,.55);border:1px solid rgba(0,0,0,.6)', click:()=>{ S.f.brick=true; say('One brick wobbles! You wiggle it loose... there\'s a hollow behind it.'); gotPiece('behind a loose brick'); refresh(); } }] : []),
-        { x:25,y:55,w:50,h:35, style:'font-size:4.5rem', html: lit?'<span class="flame">🔥</span><span class="flame">🔥</span>':'<span style="opacity:.5">💨</span>',
-          click:()=>{
-            if(lit && S.sel==='jug'){ S.f.fireOut=true; remove('jug'); $('mainFire').textContent='💨'; say('SSSSSSHHH! 💨 You pour the rainwater over the flames. A huge cloud of steam — and the fire is out.'); return refresh(); }
-            if(lit) return say('OUCH! Way too hot. If only you could put this fire out...');
-            say('Wet, grey ashes.');
-          } },
-        ...(!lit && !S.f.key ? [{ x:66,y:84,w:5,h:6, html:'<span style="font-size:.7rem;opacity:.75">✨</span>', click:()=>{ S.f.key=true; add('key'); say('Something glints in the wet ashes... a small <b>silver key</b>! 🗝️'); refresh(); } }] : []),
-        { x:0,y:90,w:100,h:10, style:'background:#555', click:()=>say('The stone hearth. Cold and cracked.') }
-      ] };
-  },
-  cabinet: () => ({
-    title:'🧪 Potion Cupboard', bg:'linear-gradient(#3a2414,#22140a)',
-    intro:'Dusty shelves crammed with jars: beetle eyes, lacewing flies, pickled rat tails...',
-    spots:[
-      { x:2,y:30,w:96,h:3, style:'background:#1a0f06', click:()=>say('A dusty shelf.') },
-      { x:2,y:63,w:96,h:3, style:'background:#1a0f06', click:()=>say('A dusty shelf.') },
-      { x:4,y:10,w:12,h:20, html:'<span style="font-size:2.2rem">🫙</span>', click:()=>say('"Beetle eyes, 5 Knuts a scoop." Gross.') },
-      { x:18,y:12,w:10,h:18, html:'<span style="font-size:2rem">🐸</span>', click:()=>say('A jar of dried toads. One of them blinks at you. You decide not to ask.') },
-      ...['red','yellow','blue','green'].map((c,i)=>!S.f['took_'+c]?{ x:[34,48,62,76][i],y:12,w:10,h:18, html:`<span style="font-size:2.2rem;filter:drop-shadow(0 0 8px ${ITEMS[c].color})">🧪</span>`, click:()=>{ S.f['took_'+c]=true; add(c); say(`You take the ${ITEMS[c].name}.`); refresh(); } }:null).filter(Boolean),
-      { x:8,y:42,w:14,h:20, html:'<span style="font-size:2.2rem">📦</span>', click:()=>say('A box labelled "Bezoars". Good to know, but not useful right now.') },
-      { x:30,y:44,w:12,h:18, html:'<span style="font-size:2rem">🦴</span>', click:()=>say('Powdered unicorn horn... or maybe just chalk. Hard to tell.') },
-      { x:52,y:40,w:22,h:22, html:'<span style="font-size:2.6rem">🫙</span>', click:()=>say('A huge jar of murky liquid. Something is floating in it. You really don\'t want to know.') },
-      ...(!S.f.gloves ? [{ x:76,y:56,w:8,h:7, html:'<span style="font-size:1rem;filter:brightness(.5)">🧤</span>', click:()=>{ S.f.gloves=true; add('gloves'); say('Squashed behind the big jar you find a pair of <b>dragon-hide gloves</b>! 🧤'); refresh(); } }] : []),
-      { x:10,y:76,w:20,h:18, html:'<span style="font-size:2rem">📚</span>', click:()=>say('Old Potions exam papers. Someone wrote "Snape is a git" in tiny letters. Brave.') },
-      { x:60,y:74,w:16,h:20, html:'<span style="font-size:2rem">🕸️</span>', click:()=>say('Cobwebs. A spider scuttles away — Ron would be screaming.') }
-    ]
-  }),
-  jar: () => ({
-    title:'🫙 A Revolting Jar', bg:'linear-gradient(#22201a,#121009)',
-    intro:'A big jar of slimy green liquid full of... eyeballs. They seem to follow you. At the very bottom, something small catches the light.',
-    spots:[
-      { x:30,y:8,w:40,h:84, style:'background:radial-gradient(ellipse,rgba(110,170,80,.55),rgba(40,70,30,.85));border:4px solid rgba(220,220,220,.35);border-radius:18% 18% 12% 12%;font-size:1.6rem;flex-wrap:wrap;align-content:center;gap:6px', html:'👁️👁️👁️<br>👁️👁️' + (S.f.brass?'':'<span style="font-size:.8rem">🔑</span>'),
-        click:()=>{
-          if(S.f.brass) return say('Just eyeballs now. They look offended.');
-          if(S.sel==='gloves'){ S.f.brass=true; say('You pull on the dragon-hide gloves, reach deep into the slime (SQUELCH!) and fish out a <b>tiny brass key</b>. 🔑'); add('brass'); return refresh(); }
-          say('There\'s definitely something at the bottom... but there is NO WAY you\'re putting your bare hand in there.');
-        } }
-    ]
-  }),
-  bookshelf: () => {
-    const books=[['Hogwarts: A History','#7a1f1f','hist'],['Quidditch Through the Ages','#1f4a7a','q'],['The Monster Book of Monsters','#5a3b1c','mon'],['Advanced Potion-Making','#2e6b3a','apm'],['Fantastic Beasts','#4a1f6b','fb'],['Magical Drafts and Potions','#2b5a50','mdp'],
-      ['One Thousand Magical Herbs and Fungi','#6b5a1f','herb'],['Defensive Magical Theory','#3a3a3a','dmt'],['Gilderoy Lockhart: Magical Me','#a04a7a','gl'],['The Standard Book of Spells','#4a3a7a','sbs'],['Moste Potente Potions','#2a4a2a','mpp'],['Dream Oracle','#5a5a8a','do']];
-    const spots=[]; books.forEach((b,i)=>{ const row=i<6?0:1, col=i%6;
-      spots.push({ x:4+col*15.5,y:row?52:6,w:13,h:40, style:`background:${b[1]};border-radius:3px;border:1px solid rgba(0,0,0,.4);writing-mode:vertical-rl;color:#f6efd8;font-size:.72rem;padding:4px;text-align:center;${b[2]==='hist'&&!S.f.hist?'':''}`, html:b[0]+(b[2]==='hist'&&!S.f.hist?' 🔒':''), click:()=>BOOK[b[2]]() }); });
-    spots.push({ x:0,y:46,w:100,h:5, style:'background:#1a0f06', click:()=>say('A sagging wooden shelf.') });
-    return { title:'📚 The Bookshelf', bg:'#2a190c', intro:'Twelve dusty books. Snape doesn\'t seem to read for fun.', spots, below:'<div id="bookOut"></div>' };
-  },
-  desk: () => ({
-    title:'🗄️ Snape\'s Desk', bg:'linear-gradient(#4a2f17,#2f1d0d)',
-    intro:'Snape\'s desk is annoyingly tidy. There\'s a drawer with a three-number lock.',
-    spots:[
-      ...(!S.f.candle ? [{ x:6,y:8,w:10,h:30, html:'<span style="font-size:2.4rem">🕯️</span>', click:()=>{ S.f.candle=true; add('candle'); say('You take the lit <b>candle</b>. 🕯️'); refresh(); } }] : []),
-      { x:22,y:14,w:14,h:20, html:'<span style="font-size:2rem">🖋️</span>', click:()=>say('An inkwell and a black quill. The ink is still wet — Snape was here recently...') },
-      { x:42,y:10,w:22,h:26, html:'<span style="font-size:2.2rem">📄📄</span>', click:()=>say('A stack of marked essays. Neville\'s has so much red ink it looks like it\'s bleeding. "T" for Troll.') },
-      { x:70,y:10,w:14,h:24, html:'<span style="font-size:2rem">⏳</span>', click:()=>say('An hourglass. The sand is running out... better hurry!') },
-      { x:86,y:12,w:10,h:20, html:'<span style="font-size:1.8rem">🪶</span>', click:()=>say('A spare quill. Very sharp.') },
-      { x:30,y:52,w:40,h:38, style:'background:#5a3a1e;border:4px solid #26170a;border-radius:6px;font-size:1.5rem', html:S.f.drawer?'📂':'🔢',
-        click:()=>openDrawer() }
-    ]
-  }),
-  chair: () => ({
-    title:'🪑 Snape\'s Chair', bg:'linear-gradient(#1d2a24 0 55%, #2b2116 55%)',
-    intro:'A hard, high-backed wooden chair. Very uncomfortable-looking.',
-    spots:[
-      { x:30,y:6,w:40,h:60, html:'<span style="font-size:7rem">🪑</span>', click:()=>say('The seat is worn smooth. Snape must sit here a lot, plotting.') },
-      { x:36,y:78,w:28,h:14, style:'background:rgba(0,0,0,.35);border-radius:50%', click:()=>{ S.f.chairClue=true;
-        say(`You crawl under the chair. Someone has scratched tiny words into the wood:<div class="paper">"Under the rug, the stone obeys the beasts in this order: first ${ANIMAL[FLAG_ORDER[0]]}, then ${ANIMAL[FLAG_ORDER[1]]}, then ${ANIMAL[FLAG_ORDER[2]]}, and last ${ANIMAL[FLAG_ORDER[3]]}."</div>`); } },
-      { x:5,y:60,w:15,h:20, html:'<span style="font-size:1.6rem;opacity:.6">🐀</span>', click:()=>say('A rat scurries away. Hopefully not Scabbers.') }
-    ]
-  }),
-  rug: () => {
-    const lifted=S.f.rugLifted;
-    const spots=[];
-    if(!lifted){
-      spots.push({ x:8,y:15,w:84,h:70, style:'background:repeating-linear-gradient(45deg,#5a1a1a 0 14px,#7a2a1f 14px 28px);border:5px solid #c9a227;border-radius:8px', click:()=>say('A heavy red-and-gold rug. Probably confiscated from a Gryffindor.') });
-      spots.push({ x:82,y:72,w:10,h:13, style:'background:linear-gradient(135deg,transparent 50%,#3a110f 50%);', click:()=>{ S.f.rugLifted=true; say('The corner of the rug was slightly curled up. You fold the rug back... and find a large flagstone with four animal carvings!'); refresh(); } });
-    } else {
-      spots.push({ x:2,y:2,w:30,h:96, style:'background:repeating-linear-gradient(45deg,#5a1a1a 0 14px,#7a2a1f 14px 28px);border:5px solid #c9a227;border-radius:8px', click:()=>say('The folded-back rug.') });
-      spots.push({ x:40,y:12,w:52,h:76, style:'background:#4a4a4a;border:4px solid #2a2a2a;border-radius:6px', html: S.f.flag?'<span style="font-size:2rem;opacity:.5">🕳️</span>':'', click:()=>say(S.f.flag?'The empty hollow under the flagstone.':'A heavy flagstone. It won\'t move by force. Maybe the carvings do something?') });
-      if(!S.f.flag) ['🦁','🦡','🦅','🐍'].forEach((a,i)=>spots.push({ x:[46,70,46,70][i],y:[20,20,52,52][i],w:16,h:26, style:'background:#5a5a5a;border-radius:50%;border:3px solid #333;font-size:2.2rem', html:a, click:()=>pressAnimal(a) }));
-    }
-    return { title:'🟥 The Rug', bg:'#2b2116', intro: lifted?'The flagstone with four carved beasts.':'The rug on the stone floor.', spots };
-  },
-  cauldron: () => ({
-    title:'⚗️ The Cauldron', bg:'linear-gradient(#1d2a24,#0d1410)',
-    intro: S.f.cauldron ? 'The golden potion glitters.' : 'A big pewter cauldron over a low fire. Engraved on the rim: "Four essences, in the right order..."',
-    spots:[
-      { x:28,y:20,w:44,h:65, style:`background:radial-gradient(ellipse at 50% 18%, ${S.f.cauldron?'#e8c547':'#3b6b3b'} 0 30%, #111 32%);border:6px solid #2b2b2b;border-radius:10% 10% 50% 50%`, html: S.potionSeq.length&&!S.f.cauldron?`<span style="font-size:.9rem;margin-top:-50%">${S.potionSeq.map(c=>`<b style="color:${ITEMS[c].color}">●</b>`).join(' ')}</span>`:'', click:()=>useCauldron() },
-      { x:40,y:86,w:20,h:12, html:'<span style="font-size:1.6rem" class="flame">🔥</span>', click:()=>say('A small, steady flame under the cauldron.') }
-    ]
-  })
-};
+function say(t){ $('msg').innerHTML=t; }
+function out(t){ const o=$('out'); if(o) o.innerHTML=t; }
+function modal(title, html, key){ S.open=key||null; $('mbody').innerHTML=`<h2>${title}</h2>${html}`; $('overlay').style.display='flex'; }
+function closeModal(){ $('overlay').style.display='none'; S.open=null; }
+$('closeM').onclick=closeModal; $('overlay').onclick=e=>{ if(e.target.id==='overlay') closeModal(); };
+function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+function solved(key, el, text){
+  S.f[key]=true; S.pieces++; $('pc').textContent=`🧩 ${S.pieces}/4`; $('mapBtn').textContent=`🧩 Map pieces (${S.pieces}/4)`;
+  if(el) el.classList.add('solved');
+  const msg = `${text} 🧩 <b>You got a piece of the map! (${S.pieces}/4)</b>` + (S.pieces===4?' That\'s all four — click "Map pieces" and put the map back together!':'');
+  out(msg); say(msg);
+}
 
-const BOOK = {
-  hist(){ const o=$('bookOut');
-    if(S.f.hist) return say('Hermione\'s favourite book. Nothing more inside.');
-    if(S.sel==='brass'){ S.f.hist=true; remove('brass'); say('The tiny brass key fits the padlock! You open "Hogwarts: A History" — the pages have been hollowed out...'); gotPiece('hidden inside "Hogwarts: A History"'); return refresh(); }
-    say('"Hogwarts: A History" has a tiny brass padlock on it. Why would Snape lock a book?'); },
-  apm(){ S.f.note=true; say(`An old, scribbled-in copy. On the page about house essences, someone has written in the margin:<div class="paper">"Add the four essences as the Sorting Hat names the founders' virtues: first the <b>brave</b>, then the <b>loyal</b>, then the <b>wise</b>, and last the <b>cunning</b>." — The Half-Blood Prince</div>`); },
-  mon(){ say('GRRRR! The book snaps at your fingers! 📕🦷 You shove it back. (Should have stroked the spine...)'); shake($('scene')); },
-  q(){ say('A library stamp: "Property of Hogwarts Library." Nothing inside.'); },
-  fb(){ say('A bookmark at the page about Nifflers: "Attracted to anything shiny." Nothing else.'); },
-  herb(){ say('A pressed piece of Gillyweed falls out. Interesting, but not helpful.'); },
-  dmt(){ say('Pages and pages of boring theory. Umbridge would love it.'); },
-  gl(){ say('Gilderoy Lockhart winks at you from the cover. Snape has drawn a moustache on him.'); },
-  sbs(){ say('"Alohomora — for opening locks." If only you had your wand...'); },
-  mdp(){ say('A potion recipe for Draught of Peace. Nothing hidden here.'); },
-  mpp(){ say('The page for Polyjuice Potion has been torn out. Hmm, Hermione...'); },
-  do(){ say('Trelawney\'s book. Someone wrote "RUBBISH" across the first page.'); }
-};
-
-// ---------------- ACTIONS ----------------
-function useCauldron(){
-  const p=S.sel;
-  if(S.f.cauldron) return say('The golden potion glitters. You\'re done here.');
-  if(p && ITEMS[p].color){
-    remove(p); S.potionSeq.push(p);
-    if(!S.potionSeq.every((x,i)=>x===POTION_ORDER[i])){
-      const back=[...S.potionSeq]; S.potionSeq=[]; back.forEach(add); shake($('scene'));
-      say('💥 POOF! Purple smoke everywhere. Wrong order! The bottles magically refill and fly back into your pockets.'); return refresh();
-    }
-    if(S.potionSeq.length===4){ S.f.cauldron=true; $('cauldron').classList.add('gold'); say('✨ The potion turns pure gold and bubbles over... A fireproof scrap of parchment floats up!'); gotPiece('in the golden potion'); return refresh(); }
-    say(`You pour in the ${ITEMS[p].name}. The potion swirls... (${S.potionSeq.length}/4)`); return refresh();
-  }
-  if(p) return say('That doesn\'t belong in a cauldron.');
-  say('An empty cauldron, bubbling softly. It needs four essences.');
-}
-function pressAnimal(a){
-  S.flagSeq.push(a);
-  if(!S.flagSeq.every((x,i)=>x===FLAG_ORDER[i])){ S.flagSeq=[]; shake($('scene')); return say('CLUNK. The carvings sink back. Wrong order — the stone resets.'); }
-  if(S.flagSeq.length===4){ S.f.flag=true; say('GRRRIND... the flagstone slides aside, revealing a small hollow!'); gotPiece('under the flagstone'); return refresh(); }
-  say(`${a} sinks into the stone with a click... (${S.flagSeq.length}/4)`);
-}
-function dialHTML(vals, faces, prefix){
-  return `<div class="dials">${vals.map((v,i)=>`<div class="dial"><button data-d="${prefix}${i}" data-dir="1">▲</button><div class="face" id="${prefix}f${i}">${faces[v]}</div><button data-d="${prefix}${i}" data-dir="-1">▼</button></div>`).join('')}</div>`;
-}
-function wireDials(arr, faces, prefix){
-  document.querySelectorAll(`[data-d^="${prefix}"]`).forEach(b=>b.onclick=()=>{ const i=+b.dataset.d.slice(prefix.length); arr[i]=(arr[i]+ +b.dataset.dir+faces.length)%faces.length; $(prefix+'f'+i).textContent=faces[arr[i]]; });
-}
-function openDrawer(){
-  S.view=null;
-  if(S.f.drawer){
-    const items=[]; if(!S.f.drawerPiece) items.push(['piece','🧩','Torn map piece']); if(!S.f.parchTaken) items.push(['parchment','📜','Blank parchment']);
-    openModal('🗄️ The Drawer', `<p>The drawer is open. ${items.length?'Inside:':'Only broken quills are left.'}</p><div class="center">${items.map(i=>`<button class="btn ghost" data-t="${i[0]}" style="margin:4px">${i[1]} ${i[2]}</button>`).join('')}</div>
-      <div class="center" style="margin-top:10px"><button class="btn" id="backDesk">← Back to the desk</button></div><div class="vmsg" id="vmsg"></div><div class="selhint" id="mSel"></div><div id="modalInv"></div>`);
-    document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
-      if(b.dataset.t==='piece'){ S.f.drawerPiece=true; gotPiece('in Snape\'s drawer'); } else { S.f.parchTaken=true; add('parchment'); say('You take the <b>blank parchment</b>. Why would Snape lock away an empty page?'); }
-      b.remove();
+// ================= PUZZLE 1: POTION LOGIC (cauldron) =================
+const COLORS = { red:['#d33','Red'], yellow:['#e8c547','Yellow'], blue:['#3b6fd8','Blue'], green:['#2e9e55','Green'] };
+const P_SOL = ['yellow','red','blue','green'];
+let pour=[];
+function openPotions(){
+  if(S.f.potion) return modal('⚗️ The Cauldron', '<p>The potion glows pure gold. You\'ve already solved this one.</p>');
+  const bottles = shuffle(Object.keys(COLORS));
+  const draw = () => {
+    modal('⚗️ Snape\'s Potion Puzzle', `<div class="paper">Four essences must be poured into the cauldron in the right order. Snape left a note:<br><br>
+      • Red is neither first nor last.<br>
+      • Green is poured <b>directly after</b> Blue.<br>
+      • Yellow is poured <b>sometime before</b> Red.<br><br>
+      <span class="small">Pour them in the wrong order and — well, you'll see.</span></div>
+      <p class="small center">Click the bottles in the order you want to pour them.</p>
+      <div class="row">${bottles.map(c=>`<div class="bottle${pour.includes(c)?' used':''}" data-c="${c}"><span style="filter:drop-shadow(0 0 8px ${COLORS[c][0]})">🧪</span><small>${COLORS[c][1]}</small></div>`).join('')}</div>
+      <div class="row">${[0,1,2,3].map(i=>`<div class="bslot">${pour[i]?`<span style="filter:drop-shadow(0 0 8px ${COLORS[pour[i]][0]})">🧪</span><small>${COLORS[pour[i]][1]}</small>`:`<small>${i+1}.</small>`}</div>`).join('')}</div>
+      <div class="center"><button class="btn ghost" id="pReset">Start over</button></div><div class="out" id="out"></div>`, 'potion');
+    document.querySelectorAll('.bottle').forEach(b=>b.onclick=()=>{
+      const c=b.dataset.c; if(pour.includes(c)) return; pour.push(c);
+      if(pour.length===4){
+        if(pour.join()===P_SOL.join()){ draw(); solved('potion',$('cauldron'),'✨ The potion turns pure gold! A fireproof scrap of parchment floats up out of the cauldron.'); }
+        else { pour=[]; draw(); shake($('modal')); out('💥 POOF! A cloud of purple smoke — your eyebrows are slightly singed. Wrong order! The bottles refill themselves. Read the clues again.'); }
+        return;
+      }
+      draw();
     });
-    $('backDesk').onclick=()=>showView('desk'); return;
-  }
-  const digits=[...Array(10).keys()].map(String);
-  openModal('🔢 The Drawer Lock', `<p>Three brass number dials.</p>${dialHTML(S.drawer,digits,'dr')}<div class="center"><button class="btn" id="tryDr">Pull the drawer</button> <button class="btn ghost" id="backDesk">← Back</button></div><div class="vmsg" id="vmsg">It's locked.</div>`);
-  wireDials(S.drawer,digits,'dr');
-  $('tryDr').onclick=()=>{ if(S.drawer.join('')==='687'){ S.f.drawer=true; say('Click! The drawer slides open.'); openDrawer(); } else { say('It won\'t budge.'); shake($('modal')); } };
-  $('backDesk').onclick=()=>showView('desk');
+    $('pReset').onclick=()=>{ pour=[]; draw(); };
+  };
+  pour=[]; draw();
 }
+
+// ================= PUZZLE 2: CIPHER (portrait + blackboard) =================
 function openPortrait(){
-  S.view=null;
-  if(S.f.portrait){
-    openModal('🖼️ Phineas Nigellus Black', `<p>The portrait has swung open like a little door, revealing a hollow in the wall.</p>${!S.f.portPiece?'<div class="center"><button class="btn ghost" id="pp">🧩 Take the torn map piece</button></div>':'<p class="small">The hollow is empty.</p>'}<div class="vmsg" id="vmsg"></div>`);
-    if($('pp')) $('pp').onclick=()=>{ S.f.portPiece=true; gotPiece('behind the portrait'); $('pp').remove(); }; return;
-  }
-  openModal('🖼️ Phineas Nigellus Black', `<p>The painted wizard looks down his nose at you. <i>"Hmph. A student. I open only for those who know the <b>password</b>. And no, I will not give you a hint."</i></p>
-    <div class="center"><input class="pw" id="pw" placeholder="Say the password..." autocomplete="off"> <button class="btn" id="pwGo">Say it</button></div><div class="vmsg" id="vmsg"></div>`);
-  const go=()=>{ const v=$('pw').value.trim().toLowerCase().replace(/\s+/g,' ');
-    if(v==='mimbulus mimbletonia'){ S.f.portrait=true; say('<i>"Hmph... correct. How tiresome."</i> The portrait swings open!'); openPortrait(); }
-    else { say('<i>"Wrong! Off with you, you ignorant child."</i>'); shake($('modal')); } };
+  if(S.f.cipher) return modal('🖼️ Phineas Nigellus Black', '<p>The portrait has swung open. The hollow behind it is empty now.</p>');
+  modal('🖼️ Phineas Nigellus Black', `<p>The painted wizard sneers: <i>"I hide something of Severus'. I open only for the secret word — and he wrote it so that no dunderhead could read it."</i></p>
+    <div class="center"><input class="pw" id="pw" placeholder="Secret word" autocomplete="off"> <button class="btn" id="pwGo">Say it</button></div><div class="out" id="out"></div>`, 'cipher');
+  const go=()=>{ const v=$('pw').value.trim().toLowerCase();
+    if(v==='phoenix'){ $('portrait').classList.add('solved'); modal('🖼️ Phineas Nigellus Black','<p><i>"Hmph. PHOENIX. Correct... how tiresome."</i> The portrait swings open like a little door.</p><div class="out" id="out"></div>'); solved('cipher',null,'Behind the portrait is a small hollow in the wall.'); }
+    else { shake($('modal')); out(`<i>"${v?v.toUpperCase()+'? ':''}Wrong! Off with you."</i>`); } };
   $('pwGo').onclick=go; $('pw').onkeydown=e=>{ if(e.key==='Enter') go(); }; setTimeout(()=>{ const e=$('pw'); if(e) e.focus(); },50);
 }
-function openDoor(){
-  S.view=null;
-  if(!S.f.puzzle){
-    openModal('🚪 The Dungeon Door', `<p>The heavy door has no handle — only four golden dials. They are frozen solid under a layer of magical ice. ❄️</p>
-      <div class="paper">A brass plate reads: <b>"Only one who has made the torn map whole again may turn my dials."</b></div><div class="vmsg" id="vmsg">You try to turn a dial. It doesn't move a millimetre.</div>`); return;
-  }
-  openModal('🚪 The Dungeon Door', `<p>The ice has melted! The four golden dials can turn now.</p>${dialHTML(S.door,SYMS,'dd')}<div class="center"><button class="btn" id="tryDoor">Push the door</button></div><div class="vmsg" id="vmsg"></div>`);
-  wireDials(S.door,SYMS,'dd');
-  $('tryDoor').onclick=()=>{ if(S.door.map(i=>SYMS[i]).join('')===CODE.join('')) win(); else { say('The dials flash red. The door stays shut.'); shake($('modal')); } };
+function openBlackboard(){
+  modal('📝 The Blackboard', `<div class="paper" style="background:#1f2b22;color:#dfe9dd;font-family:'Comic Sans MS',cursive;font-style:normal">
+    Rule of three: every letter must take three steps back.<br><br><span style="font-size:2rem;letter-spacing:8px">SKRHQLA</span><br><br>— S.S.</div>
+    <p class="small">The alphabet, in case it helps:</p><div class="center" style="letter-spacing:4px;font-size:1.05rem">ABCDEFGHIJKLM<br>NOPQRSTUVWXYZ</div>
+    <p class="small">Scribble pad:</p><div class="center"><input class="pw" id="pad" autocomplete="off" placeholder="your notes..."></div>`, 'cipher');
 }
 
-// main room clicks
-const MAIN = {
-  bookshelf:()=>showView('bookshelf'), window:()=>showView('window'), fireplace:()=>showView('fireplace'), desk:()=>showView('desk'),
-  chair:()=>showView('chair'), rug:()=>showView('rug'), cauldron:()=>showView('cauldron'), jar:()=>showView('jar'),
-  portrait:()=>openPortrait(), door:()=>openDoor(),
-  blackboard:()=>say('The blackboard: <b>"My drawer remembers the vault where the Boy Who Lived kept his gold."</b> — S.S. Do you remember the number of Harry\'s vault at Gringotts?'),
-  cabinet:()=>{
-    if(S.f.cabinet) return showView('cabinet');
-    if(S.sel==='key'){ S.f.cabinet=true; remove('key'); say('The silver key turns with a click. The potion cupboard swings open!'); return showView('cabinet'); }
-    shake($('cabinet')); say('The potion cupboard is locked. There\'s a small silver keyhole.');
-  }
-};
-document.querySelectorAll('#stage .hot').forEach(h=>h.addEventListener('click',e=>{ e.stopPropagation(); MAIN[h.dataset.o](); }));
-$('stage').addEventListener('click',()=>say(S.sel?`Using the ${ITEMS[S.sel].name} there does nothing.`:pick(NOTHING)));
+// ================= PUZZLE 3: NUMBER RIDDLE (drawer) =================
+const dr=[0,0,0];
+function dialHTML(vals, faces, prefix){ return `<div class="dials">${vals.map((v,i)=>`<div class="dial"><button data-d="${prefix}${i}" data-dir="1">▲</button><div class="face" id="${prefix}f${i}">${faces[v]}</div><button data-d="${prefix}${i}" data-dir="-1">▼</button></div>`).join('')}</div>`; }
+function wireDials(arr, faces, prefix){ document.querySelectorAll(`[data-d^="${prefix}"]`).forEach(b=>b.onclick=()=>{ const i=+b.dataset.d.slice(prefix.length); arr[i]=(arr[i]+ +b.dataset.dir+faces.length)%faces.length; $(prefix+'f'+i).textContent=faces[arr[i]]; }); }
+function openDrawer(){
+  if(S.f.number) return modal('🗄️ Snape\'s Drawer', '<p>The drawer is open and empty — apart from some broken quills.</p>');
+  const digits=[...Array(10).keys()].map(String);
+  modal('🔢 Snape\'s Drawer', `<p>The drawer has a three-digit lock. A riddle is carved into the wood:</p>
+    <div class="paper">"I am a number with three digits.<br>
+      My <b>middle</b> digit is the biggest a digit can be.<br>
+      My <b>first</b> digit is eight less than my middle one.<br>
+      My <b>last</b> digit is my first and middle digits' difference, halved.<br>
+      What am I?"</div>
+    ${dialHTML(dr,digits,'dr')}<div class="center"><button class="btn" id="tryDr">Pull the drawer</button></div><div class="out" id="out"></div>`, 'number');
+  wireDials(dr,digits,'dr');
+  $('tryDr').onclick=()=>{ if(dr.join('')==='194'){ $('desk').classList.add('solved'); solved('number',null,'Click! The drawer slides open.'); } else { shake($('modal')); out('It won\'t budge. Read the riddle again, line by line.'); } };
+}
 
-// ---------------- PUZZLE ----------------
-const PIECE_IMG = (()=>{
-  const W=600,H=400,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
-  const grd=g.createRadialGradient(300,200,40,300,200,380); grd.addColorStop(0,'#f3e6bd'); grd.addColorStop(1,'#c9ad6e'); g.fillStyle=grd; g.fillRect(0,0,W,H);
-  g.strokeStyle='#7a5a2a'; g.lineWidth=6; g.strokeRect(14,14,W-28,H-28); g.lineWidth=2; g.strokeRect(26,26,W-52,H-52);
-  g.fillStyle='#5a3a14'; g.textAlign='center'; g.font='italic bold 30px Georgia'; g.fillText('The door obeys four signs:',300,82);
-  g.font='italic 20px Georgia'; g.fillText('read them from left to right',300,112);
-  const xs=[105,235,365,495]; const nums=['I','II','III','IV'];
-  CODE.forEach((s,i)=>{
-    g.font='bold 22px Georgia'; g.fillStyle='#5a3a14'; g.fillText(nums[i],xs[i],160);
-    g.beginPath(); g.arc(xs[i],222,56,0,Math.PI*2); g.fillStyle='rgba(122,90,42,.15)'; g.fill(); g.strokeStyle='#7a5a2a'; g.lineWidth=3; g.stroke();
-    g.fillStyle='#3b2410'; g.font='72px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",serif'; g.textBaseline='middle'; g.fillText(s,xs[i],226); g.textBaseline='alphabetic';
-  });
-  g.fillStyle='#5a3a14'; g.font='italic 22px Georgia'; g.fillText('"Mischief Managed" — M. W. P. & P.',300,338);
-  const out=[]; for(let i=0;i<6;i++){ const p=document.createElement('canvas'); p.width=200; p.height=200; p.getContext('2d').drawImage(c,(i%3)*200,Math.floor(i/3)*200,200,200,0,0,200,200); out.push(p.toDataURL()); }
+// ================= PUZZLE 4: RUNE LIGHTS (rug / flagstone) =================
+let runes=null, runeStart=null, runeMoves=0;
+const RUNE_CH=['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ'];
+function press(arr,i){ const r=Math.floor(i/3), c=i%3; [[0,0],[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{ const rr=r+dr, cc=c+dc; if(rr>=0&&rr<3&&cc>=0&&cc<3) arr[rr*3+cc]=!arr[rr*3+cc]; }); }
+function initRunes(){ runes=Array(9).fill(true); shuffle([0,1,2,3,4,5,6,7,8]).slice(0,3).forEach(i=>press(runes,i)); if(runes.every(x=>x)) return initRunes(); runeStart=[...runes]; runeMoves=0; }
+function openRunes(){
+  if(S.f.runes) return modal('🟥 The Flagstone', '<p>The rug is folded back and the flagstone has slid aside. The hollow beneath is empty now.</p>');
+  if(!runes) initRunes();
+  const draw=()=>{
+    modal('🟥 Under the Rug', `<p>You fold back the rug and find a flagstone with nine carved runes. Some of them glow blue.</p>
+      <div class="paper">Scratched next to it: <i>"Wake every rune, and the stone will let you pass. But careful — each rune you touch also wakes or puts to sleep its neighbours above, below, left and right."</i></div>
+      <div class="runes">${runes.map((on,i)=>`<div class="rune${on?' on':''}" data-r="${i}">${RUNE_CH[i]}</div>`).join('')}</div>
+      <p class="center small">Moves: ${runeMoves} &nbsp; <button class="btn ghost" id="rReset">Start over</button></p><div class="out" id="out"></div>`, 'runes');
+    document.querySelectorAll('.rune').forEach(el=>el.onclick=()=>{ press(runes,+el.dataset.r); runeMoves++; draw();
+      if(runes.every(x=>x)){ $('rug').classList.add('solved'); solved('runes',null,'All nine runes blaze blue! GRRRIND... the flagstone slides aside, revealing a small hollow.'); } });
+    $('rReset').onclick=()=>{ runes=[...runeStart]; runeMoves=0; draw(); };
+  };
+  draw();
+}
+
+// ================= MAP (jigsaw 2x2) =================
+const PIECE_IMG=(()=>{
+  const W=400,c=document.createElement('canvas'); c.width=W; c.height=W; const g=c.getContext('2d');
+  const grd=g.createRadialGradient(200,200,30,200,200,300); grd.addColorStop(0,'#f3e6bd'); grd.addColorStop(1,'#c9ad6e'); g.fillStyle=grd; g.fillRect(0,0,W,W);
+  g.strokeStyle='#7a5a2a'; g.lineWidth=6; g.strokeRect(12,12,W-24,W-24); g.lineWidth=2; g.strokeRect(22,22,W-44,W-44);
+  g.fillStyle='#5a3a14'; g.textAlign='center'; g.font='italic bold 26px Georgia'; g.fillText('The door obeys',200,70); g.fillText('four signs',200,102);
+  g.font='italic 17px Georgia'; g.fillText('read them from left to right',200,132);
+  const xs=[62,154,246,338];
+  CODE.forEach((s,i)=>{ g.font='bold 18px Georgia'; g.fillStyle='#5a3a14'; g.fillText(['I','II','III','IV'][i],xs[i],168);
+    g.beginPath(); g.arc(xs[i],212,40,0,Math.PI*2); g.fillStyle='rgba(122,90,42,.15)'; g.fill(); g.strokeStyle='#7a5a2a'; g.lineWidth=3; g.stroke();
+    g.fillStyle='#3b2410'; g.font='52px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",serif'; g.textBaseline='middle'; g.fillText(s,xs[i],215); g.textBaseline='alphabetic'; });
+  g.fillStyle='#5a3a14'; g.font='italic 19px Georgia'; g.fillText('"Mischief Managed"',200,310); g.font='italic 15px Georgia'; g.fillText('— M. W. P. & P.',200,336);
+  const out=[]; for(let i=0;i<4;i++){ const p=document.createElement('canvas'); p.width=200; p.height=200; p.getContext('2d').drawImage(c,(i%2)*200,Math.floor(i/2)*200,200,200,0,0,200,200); out.push(p.toDataURL()); }
   return out;
 })();
-const FIND_ORDER=shuffle([0,1,2,3,4,5]);
-let puzzleSel=null;
-function syncPuzzle(){ while(S.puzzle.length<S.pieces){ S.puzzle.push({img:FIND_ORDER[S.puzzle.length], slot:null, rot:1+Math.floor(Math.random()*3)}); } }
-function openPuzzle(){
-  S.view=null; syncPuzzle(); const p=S.puzzle;
-  const pieceEl=(pc,idx)=>`<div class="piece${puzzleSel===idx?' sel':''}" data-p="${idx}" style="background-image:url(${PIECE_IMG[pc.img]});transform:rotate(${pc.rot*90}deg)"></div>`;
-  const slots=[...Array(6).keys()].map(s=>{ const idx=p.findIndex(x=>x.slot===s); return `<div class="slot" data-s="${s}">${idx>-1?pieceEl(p[idx],idx):''}</div>`; }).join('');
-  const tray=p.map((pc,idx)=>pc.slot===null?pieceEl(pc,idx):'').join('');
-  openModal('🧩 The Torn Map', `<p class="small">Click a piece to pick it up, then click an empty square to place it. Click the picked-up piece <b>again</b> to rotate it. Click a placed piece while holding another to swap them.</p>
+const ORDER=shuffle([0,1,2,3]); const puzzle=[]; let psel=null;
+function openMap(){
+  while(puzzle.length<S.pieces) puzzle.push({img:ORDER[puzzle.length], slot:null, rot:1+Math.floor(Math.random()*3)});
+  if(!S.pieces) return modal('🧩 Map pieces', '<p>You don\'t have any pieces yet. Solve the puzzles around the room!</p>');
+  const el=(pc,i)=>`<div class="piece${psel===i?' sel':''}" data-p="${i}" style="background-image:url(${PIECE_IMG[pc.img]});transform:rotate(${pc.rot*90}deg)"></div>`;
+  const slots=[0,1,2,3].map(s=>{ const i=puzzle.findIndex(x=>x.slot===s); return `<div class="slot" data-s="${s}">${i>-1?el(puzzle[i],i):''}</div>`; }).join('');
+  const tray=puzzle.map((pc,i)=>pc.slot===null?el(pc,i):'').join('');
+  modal('🧩 The Torn Map', `<p class="small">Click a piece to pick it up, then click an empty square. Click the picked-up piece <b>again</b> to rotate it. Click a placed piece while holding another to swap them.</p>
     <div class="pgrid">${slots}</div><div class="tray">${tray||'<span class="small" style="align-self:center">No loose pieces.</span>'}</div>
-    <p class="center small">${S.pieces<6?`You have ${S.pieces} of 6 pieces. The map only works when it's complete!`:''} ${puzzleSel!==null&&p[puzzleSel].slot!==null?'<button class="btn ghost" id="toTray">Back to tray</button>':''}</p><div id="pzOut" class="center"></div>`);
-  document.querySelectorAll('.piece').forEach(el=>el.onclick=e=>{
-    e.stopPropagation(); const idx=+el.dataset.p;
-    if(puzzleSel===idx) p[idx].rot=(p[idx].rot+1)%4;
-    else if(puzzleSel!==null && p[idx].slot!==null){ const a=p[puzzleSel].slot; p[puzzleSel].slot=p[idx].slot; p[idx].slot=a; puzzleSel=null; }
-    else puzzleSel=idx;
-    openPuzzle(); checkPuzzle();
-  });
-  document.querySelectorAll('.slot').forEach(el=>el.onclick=()=>{ const s=+el.dataset.s; if(puzzleSel===null||p.some(x=>x.slot===s)) return; p[puzzleSel].slot=s; puzzleSel=null; openPuzzle(); checkPuzzle(); });
-  const tt=$('toTray'); if(tt) tt.onclick=()=>{ p[puzzleSel].slot=null; puzzleSel=null; openPuzzle(); };
-  if(S.f.puzzle){ document.querySelectorAll('.slot').forEach(s=>s.style.border='2px solid #e8c547'); $('pzOut').innerHTML='<p style="color:#e8c547"><b>✨ The map is whole again — and somewhere, ice is cracking...</b></p>'; }
+    <p class="center small">${S.pieces<4?`You have ${S.pieces} of 4 pieces.`:''} ${psel!==null&&puzzle[psel].slot!==null?'<button class="btn ghost" id="toTray">Back to tray</button>':''}</p><div class="out" id="out">${S.f.map?'✨ <b>The map is whole! Somewhere, ice is cracking...</b>':''}</div>`, 'map');
+  document.querySelectorAll('.piece').forEach(d=>d.onclick=e=>{ e.stopPropagation(); const i=+d.dataset.p;
+    if(psel===i) puzzle[i].rot=(puzzle[i].rot+1)%4;
+    else if(psel!==null && puzzle[i].slot!==null){ const a=puzzle[psel].slot; puzzle[psel].slot=puzzle[i].slot; puzzle[i].slot=a; psel=null; }
+    else psel=i;
+    openMap(); checkMap(); });
+  document.querySelectorAll('.slot').forEach(d=>d.onclick=()=>{ const s=+d.dataset.s; if(psel===null||puzzle.some(x=>x.slot===s)) return; puzzle[psel].slot=s; psel=null; openMap(); checkMap(); });
+  const tt=$('toTray'); if(tt) tt.onclick=()=>{ puzzle[psel].slot=null; psel=null; openMap(); };
+  if(S.f.map) document.querySelectorAll('.slot').forEach(s=>s.style.border='2px solid #e8c547');
 }
-function checkPuzzle(){
-  if(S.pieces<6||S.f.puzzle) return;
-  if(S.puzzle.every(x=>x.slot===x.img && x.rot%4===0)){ S.f.puzzle=true; puzzleSel=null; openPuzzle(); say('✨ The pieces glow and fuse into one parchment! You hear a CRACK from the door — like ice breaking...'); }
+function checkMap(){ if(S.pieces<4||S.f.map) return; if(puzzle.every(x=>x.slot===x.img&&x.rot===0)){ S.f.map=true; psel=null; $('door').classList.add('thawed'); openMap(); say('✨ The pieces glow and fuse into one parchment! You hear a loud CRACK from the door — the ice is melting!'); } }
+$('mapBtn').onclick=openMap;
+
+// ================= DOOR =================
+const dd=[0,0,0,0];
+function openDoor(){
+  if(!S.f.map) return modal('🚪 The Dungeon Door', `<p>The heavy door has four golden dials — but they're frozen solid under a layer of magical ice. ❄️</p><div class="paper">A brass plate reads: <b>"Only one who has made the torn map whole again may turn my dials."</b></div><p class="small">Map pieces: ${S.pieces}/4</p>`);
+  modal('🚪 The Dungeon Door', `<p>The ice has melted! The four dials turn now.</p>${dialHTML(dd,SYMS,'dd')}<div class="center"><button class="btn" id="tryDoor">Push the door</button></div><div class="out" id="out"></div>`, 'door');
+  wireDials(dd,SYMS,'dd');
+  $('tryDoor').onclick=()=>{ if(dd.map(i=>SYMS[i]).join('')===CODE.join('')) win(); else { shake($('modal')); out('The dials flash red. The door stays shut. Check the map again!'); } };
 }
 
-// ---------------- HINTS (two levels per step) ----------------
-function nextStep(){
-  const f=S.f;
-  const steps=[
-    [!f.jug && !f.fireOut, 'water', 'The fire is guarding something. You\'ll need water — where does water get into a dungeon?', 'Look closely at the windowsill. Rain drips in somewhere in the corner.'],
-    [!f.fireOut, 'fire', 'You have water now. What\'s too hot to search?', 'Select the jug, open the fireplace and click the flames.'],
-    [!f.key || !f.brick, 'ashes', 'Now that the fire is out, search the fireplace very carefully — the ashes AND the wall.', 'Something glints in the ashes on the right, and one brick on the right side of the wall looks different.'],
-    [!f.cabinet, 'cab', 'That silver key must fit a lock somewhere in the room.', 'Select the key and click the potion cupboard.'],
-    [!['red','yellow','blue','green'].every(c=>f['took_'+c]) || !f.gloves, 'cab2', 'Search the cupboard thoroughly. Not everything is in plain sight.', 'Take all four essences — and look behind the big jar on the lower shelf.'],
-    [!f.note, 'note', 'The cauldron wants four essences in a certain order. Maybe a book explains it?', 'Read "Advanced Potion-Making" on the bookshelf.'],
-    [!f.cauldron, 'brew', 'Brave, loyal, wise, cunning — which houses are those, and what are their colours?', 'Gryffindor = red, Hufflepuff = yellow, Ravenclaw = blue, Slytherin = green. Select each bottle and click the cauldron in that order.'],
-    [!f.brass, 'jar', 'Those dragon-hide gloves would let you touch something disgusting...', 'Select the gloves and click the jar of eyeballs on the floor.'],
-    [!f.hist, 'hist', 'A tiny brass key fits a tiny padlock. Something on the bookshelf is locked.', 'Select the brass key and click "Hogwarts: A History".'],
-    [!f.drawer, 'drawer', 'Read the blackboard. Which vault number did Harry have at Gringotts?', 'It\'s vault 687. Set the drawer dials to 6 – 8 – 7.'],
-    [!f.drawerPiece || !f.parchTaken || !f.candle, 'drawer2', 'Take everything from the drawer — and from the desk.', 'There\'s a piece and a blank parchment in the drawer, and a candle on the desk.'],
-    [!has('secret') && !f.portrait, 'heat', 'Waxy parchment... secret writing often appears with gentle heat.', 'Select the candle, then click the blank parchment in your inventory.'],
-    [!f.portrait, 'pw', 'Read the revealed parchment (click it twice). What was the Gryffindor password with the cactus-like plant?', 'The password is "Mimbulus mimbletonia".'],
-    [!f.portPiece, 'pp', 'Look inside the opened portrait.', 'Click the portrait again and take the piece.'],
-    [!f.rugLifted, 'rug', 'The rug isn\'t lying perfectly flat.', 'Open the rug and click its curled-up corner (bottom right).'],
-    [!f.chairClue, 'chair', 'The flagstone needs an order. Someone left a secret note where nobody looks.', 'Look UNDER Snape\'s chair.'],
-    [!f.flag, 'flag', 'Press the beasts on the flagstone in the order from the chair.', 'Follow the carving under the chair exactly. If you make a mistake, the stone resets.'],
-    [!f.puzzle, 'puzzle', 'Click "Map pieces". Rotate each piece until the writing is upright.', 'The title goes on top, the circles with symbols run across the middle, and the quote is at the bottom.'],
-    [true, 'door', 'The door\'s ice should be gone now.', 'Set the four dials to the symbols on the map, from left to right.']
-  ];
-  return steps.find(s=>s[0]);
-}
-$('hintBtn').onclick=()=>{ const s=nextStep(); const lvl=S.hint[s[1]]||0; S.hint[s[1]]=Math.min(lvl+1,2); say('🦉 <b>Hint'+(lvl?' (more help)':'')+':</b> '+(lvl?s[3]:s[2])+(lvl?'':' <span class="small">(Click again for more help.)</span>')); };
+// ================= ROOM =================
+const FLAVOR = {
+  bookshelf:'Rows of potion books. "Advanced Potion-Making", "Moste Potente Potions"... and "Gilderoy Lockhart: Magical Me" with a moustache drawn on the cover. Nothing hidden here.',
+  window:'A high, barred window. The Black Lake glows in the moonlight. The giant squid waves. No way out.',
+  fireplace:'A crackling fire. Nice and warm — the only friendly thing in this dungeon.',
+  jar:'A jar of pickled eyeballs. They seem to follow you. 🤢 Definitely not a puzzle — just Snape\'s idea of decoration.',
+  chair:'Snape\'s hard wooden chair. Very uncomfortable. Very Snape.'
+};
+const OPEN = { cauldron:openPotions, portrait:openPortrait, blackboard:openBlackboard, desk:openDrawer, rug:openRunes, door:openDoor };
+document.querySelectorAll('#stage .hot').forEach(h=>h.onclick=()=>{ const o=h.dataset.o; if(OPEN[o]) OPEN[o](); else say(FLAVOR[o]); });
 
-// ---------------- TIMER & WIN ----------------
+// ================= HINTS =================
+const HINTS = {
+  potion:['Try each position for Red — it can only be 2nd or 3rd. Then see where Blue+Green (always together) can still fit.','Red can\'t be 3rd: then Blue and Green would have no two neighbouring spots left. So Red is 2nd, Yellow is 1st... and the rest follows.'],
+  cipher:['The secret word is on the blackboard. "Three steps back" means: S → R → Q → P.','Shift every letter back by 3: S→P, K→H, R→O ... The word is a magical bird.'],
+  number:['"The biggest a digit can be" is 9. So the middle digit is 9.','Middle = 9, first = 9 − 8 = 1, last = (9 − 1) ÷ 2 = 4.'],
+  runes:['Every touch flips the rune AND its neighbours. Try touching a dark rune in a corner or edge and watch what happens.','It can always be solved with exactly 3 touches. Touching the same rune twice cancels itself out, so each rune needs at most one touch. Try touching dark corner runes first.'],
+  map:['The title goes at the top, the circles with symbols run across the middle.','Rotate each piece until its writing is upright. The piece with "The door obeys" goes top-left.'],
+  door:['Set the dials to the symbols on the map.','Read the four circles on the map from left to right (I, II, III, IV).']
+};
+$('hintBtn').onclick=()=>{
+  let key=S.open;
+  if(!key || S.f[key]){ const left=['potion','cipher','number','runes'].filter(k=>!S.f[k]);
+    if(left.length) return say(`🦉 <b>Hint:</b> You still have ${left.length} puzzle${left.length>1?'s':''} to solve: ${left.map(k=>({potion:'the cauldron',cipher:'the portrait',number:'the drawer',runes:'something under the rug'})[k]).join(', ')}. Open one and press Hint again for help with it.`);
+    key = S.f.map ? 'door' : 'map'; }
+  const lvl=S.hintLvl[key]||0; S.hintLvl[key]=Math.min(lvl+1,2); S.hints++;
+  const t=`🦉 <b>Hint${lvl?' (more help)':''}:</b> ${HINTS[key][Math.min(lvl,1)]}`; say(t); out(t);
+};
+
+// ================= TIMER & WIN =================
 const fmt=ms=>{ const s=Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); };
 setInterval(()=>{ if(!S.done) $('timer').textContent=fmt(Date.now()-S.start); },1000);
 function win(){
-  S.done=true; const t=fmt(Date.now()-S.start); const hints=Object.values(S.hint).reduce((a,b)=>a+b,0);
-  openModal('🎉 You escaped!', `<div class="center"><div style="font-size:4rem">🚪✨🧙‍♂️</div>
+  S.done=true; const t=fmt(Date.now()-S.start);
+  modal('🎉 You escaped!', `<div class="center"><div style="font-size:4rem">🚪✨🧙‍♂️</div>
     <p>The four symbols blaze with golden light and the heavy door swings open. You sprint up the dungeon stairs just as you hear Snape's footsteps behind you...</p>
-    <p style="font-size:1.4rem;color:#e8c547"><b>Escape time: ${t}</b></p><p>Hints used: ${hints}</p>
-    <p><i>${hints===0?'"Fifty points to Gryffindor!" — not a single hint. Outstanding!':'"Ten points to Gryffindor." — Well done!'}</i></p>
+    <p style="font-size:1.4rem;color:#e8c547"><b>Escape time: ${t}</b></p><p>Hints used: ${S.hints}</p>
+    <p><i>${S.hints===0?'"Fifty points to Gryffindor!" — no hints at all. Brilliant!':'"Ten points to Gryffindor." — Well done!'}</i></p>
     <button class="btn" onclick="location.reload()">Play again</button></div>`);
   say('🎉 Freedom! You escaped from Snape\'s dungeon!');
 }
-renderInv();
 </script>
 </body>
 </html>
