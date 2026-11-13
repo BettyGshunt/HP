@@ -1,3 +1,5 @@
-# The O.C. Quiz for Melih
+# Quizzes
 
-A hard 14-question quiz about the TV show The O.C. Play it at https://bettygshunt.github.io/hp/
+- The O.C. quiz for Melih: https://bettygshunt.github.io/hp/
+- The O.C. quiz for Mami: https://bettygshunt.github.io/hp/mami-oc/
+- Austin-Healey quiz for Mami: https://bettygshunt.github.io/hp/austin-healey/

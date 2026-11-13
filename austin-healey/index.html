@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Austin-Healey Quiz for Mami</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background: radial-gradient(circle at top, #1f5a3a, #08180f 70%); color:#eef4f8;
+         font-family: Georgia, "Times New Roman", serif; }
+  .card { width:min(92vw, 560px); background:#0e2418; border:2px solid #c9a227; border-radius:16px;
+          padding:28px; box-shadow:0 0 40px rgba(201,162,39,.25); }
+  h1 { margin:0 0 6px; color:#e8c547; font-size:1.7rem; text-align:center; }
+  .sub { text-align:center; opacity:.8; margin-bottom:22px; }
+  .progress { font-size:.9rem; opacity:.75; margin-bottom:8px; }
+  .q { font-size:1.2rem; margin-bottom:18px; }
+  button.opt { display:block; width:100%; text-align:left; margin:8px 0; padding:12px 14px;
+               font:inherit; color:#eef4f8; background:#173a27; border:1px solid #c9a227;
+               border-radius:10px; cursor:pointer; transition:.15s; }
+  button.opt:hover:not(:disabled) { background:#215235; }
+  button.opt.right { background:#1f5b3a; border-color:#3fbf7a; }
+  button.opt.wrong { background:#6b1f2a; border-color:#d9475b; }
+  .fb { min-height:1.4em; margin:12px 0; font-style:italic; }
+  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#0e2418;
+                    border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
+  .center { text-align:center; }
+  .big { font-size:3rem; margin:10px 0; }
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const questions = [
+  { q: "at which motor show was the Healey 100 first shown in 1952?", a: ["Geneva Motor Show", "Earls Court Motor Show in London", "Paris Motor Show", "Frankfurt IAA"], c: 1,
+    f: "Earls Court in London, October 1952 – it was the star of the show." },
+  { q: "which Austin boss saw the car at the show and made a deal with Donald Healey?", a: ["Leonard Lord", "Alec Issigonis", "William Morris", "Herbert Austin"], c: 0,
+    f: "Leonard Lord – overnight the Healey 100 became the Austin-Healey 100." },
+  { q: "what does the \"100\" in Austin-Healey 100 stand for?", a: ["100 horsepower", "100 cars built per month", "A top speed of 100 mph", "Its price of £100"], c: 2,
+    f: "100 mph – few cars of that era could keep that speed." },
+  { q: "and what does the \"3000\" stand for?", a: ["Its engine size of about 3000 cc", "The 3000th car built", "Its weight in pounds", "Its price in dollars"], c: 0,
+    f: "The engine size – a 2912 cc engine, rounded up to 3000." },
+  { q: "what kind of engine did the first Austin-Healey 100 have?", a: ["A V8", "A 2660 cc four-cylinder from the Austin A90", "A straight-six", "A two-stroke"], c: 1,
+    f: "A 2.7-litre four-cylinder from the Austin A90 – that's why it's also called the 100/4." },
+  { q: "what kind of engine powers the Austin-Healey 3000?", a: ["A four-cylinder", "A V6", "A straight-six", "A V12"], c: 2,
+    f: "A 2.9-litre straight-six." },
+  { q: "who was Donald Healey's chief stylist, who shaped the Healey 100?", a: ["Gerry Coker", "Giovanni Michelotti", "Pininfarina", "Malcolm Sayer"], c: 0,
+    f: "Gerry Coker. (Malcolm Sayer designed the Jaguar E-Type!)" },
+  { q: "which models are called the \"Big Healeys\"?", a: ["The Sprite and the Midget", "The 100, 100-6 and 3000", "Only the 3000 Mk III", "The Healey Silverstone and Elliott"], c: 1,
+    f: "The 100, 100-6 and 3000 – \"big\" only compared to the tiny Sprite." },
+  { q: "what was the little Austin-Healey Sprite nicknamed in Britain?", a: ["The Beetle", "The Frogeye", "The Mouse", "The Pocket Rocket"], c: 1,
+    f: "The Frogeye – and the Bugeye in America." },
+  { q: "why did it get that nickname?", a: ["It was always painted green", "Its headlights sat on top of the bonnet", "It could drive through water", "Its horn sounded like a frog"], c: 1,
+    f: "The headlights sit up on top of the bonnet like a frog's eyes." },
+  { q: "in 1957, production moved to Abingdon – which rival brand's home factory was that?", a: ["Triumph", "Jaguar", "MG", "Morgan"], c: 2,
+    f: "MG's factory in Abingdon." },
+  { q: "whose sister was rally star Pat Moss, who won in an Austin-Healey 3000?", a: ["Jackie Stewart's", "Graham Hill's", "Stirling Moss's", "Jim Clark's"], c: 2,
+    f: "Stirling Moss's younger sister – and a star rally driver herself." },
+  { q: "which famous rally did Pat Moss and Ann Wisdom win outright in 1960?", a: ["Monte Carlo Rally", "Liège-Rome-Liège", "Safari Rally", "RAC Rally"], c: 1,
+    f: "Liège-Rome-Liège, \"The Marathon\" – about 96 hours of almost non-stop driving." },
+  { q: "what was the registration number of that famous rally car?", a: ["URX 727", "ABC 123", "DH 100", "BMC 3000"], c: 0,
+    f: "URX 727 – maybe the most famous Austin-Healey in the world." }
+];
+
+let i = 0, score = 0;
+const app = document.getElementById("app");
+
+function start() {
+  app.innerHTML = `
+    <h1>🏎️ Austin-Healey Quiz 🏁</h1>
+    <div class="sub">Made for Mami – how well do you know the classic British roadster?</div>
+    <div class="center"><div class="big">🚗</div>
+    <p>${questions.length} questions. Start your engine!</p>
+    <button class="next" onclick="show()">Start</button></div>`;
+}
+
+function show() {
+  const item = questions[i];
+  app.innerHTML = `
+    <div class="progress">Question ${i + 1} of ${questions.length} · Score: ${score}</div>
+    <div class="q">Mami, ${item.q.charAt(0).toLowerCase() + item.q.slice(1)}</div>
+    ${item.a.map((t, k) => `<button class="opt" data-k="${k}">${t}</button>`).join("")}
+    <div class="fb" id="fb"></div>
+    <div id="nav"></div>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.k));
+}
+
+function answer(k) {
+  const item = questions[i];
+  const btns = app.querySelectorAll(".opt");
+  btns.forEach(b => b.disabled = true);
+  btns[item.c].classList.add("right");
+  if (k === item.c) { score++; document.getElementById("fb").textContent = "✨ Correct! " + item.f; }
+  else { btns[k].classList.add("wrong"); document.getElementById("fb").textContent = "Not quite. " + item.f; }
+  document.getElementById("nav").innerHTML =
+    `<button class="next" onclick="next()">${i < questions.length - 1 ? "Next ➜" : "See result"}</button>`;
+}
+
+function next() { i++; i < questions.length ? show() : result(); }
+
+function result() {
+  const pct = score / questions.length;
+  const title = pct === 1 ? "Concours winner – a true Healey expert! 🏆"
+              : pct >= .7 ? "Rally champion – Pat Moss would be proud! 🏁"
+              : pct >= .4 ? "Nice drive – just a bit more oil needed! 🔧"
+              : "Stuck in the garage – try another lap, Mami! 🚗";
+  app.innerHTML = `
+    <h1>Well done, Mami!</h1>
+    <div class="center"><div class="big">${score} / ${questions.length}</div>
+    <p>${title}</p>
+    <button class="restart" onclick="i=0;score=0;start()">Play again</button></div>`;
+}
+
+start();
+</script>
+</body>
+</html>

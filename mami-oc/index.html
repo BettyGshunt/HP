@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The O.C. Quiz for Mami</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background: radial-gradient(circle at top, #e07a3c, #1b2a4a 70%); color:#eef4f8;
+         font-family: Georgia, "Times New Roman", serif; }
+  .card { width:min(92vw, 560px); background:#132238; border:2px solid #c9a227; border-radius:16px;
+          padding:28px; box-shadow:0 0 40px rgba(201,162,39,.25); }
+  h1 { margin:0 0 6px; color:#e8c547; font-size:1.7rem; text-align:center; }
+  .sub { text-align:center; opacity:.8; margin-bottom:22px; }
+  .progress { font-size:.9rem; opacity:.75; margin-bottom:8px; }
+  .q { font-size:1.2rem; margin-bottom:18px; }
+  button.opt { display:block; width:100%; text-align:left; margin:8px 0; padding:12px 14px;
+               font:inherit; color:#eef4f8; background:#1d3556; border:1px solid #4f86c6;
+               border-radius:10px; cursor:pointer; transition:.15s; }
+  button.opt:hover:not(:disabled) { background:#284a75; }
+  button.opt.right { background:#1f5b3a; border-color:#3fbf7a; }
+  button.opt.wrong { background:#6b1f2a; border-color:#d9475b; }
+  .fb { min-height:1.4em; margin:12px 0; font-style:italic; }
+  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#132238;
+                    border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
+  .center { text-align:center; }
+  .big { font-size:3rem; margin:10px 0; }
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const questions = [
+  { q: "Who created The O.C.?", a: ["Kevin Williamson", "Josh Schwartz", "Darren Star", "Shonda Rhimes"], c: 1,
+    f: "Josh Schwartz – he later co-created Gossip Girl too." },
+  { q: "Which town is Ryan Atwood originally from?", a: ["Riverside", "Chino", "Fresno", "Long Beach"], c: 1,
+    f: "Chino – \"This is the O.C., not Chino!\"" },
+  { q: "What is Sandy Cohen's job when the show starts?", a: ["Real estate developer", "Surgeon", "Public defender", "High school teacher"], c: 2,
+    f: "A public defender – that's how he meets Ryan." },
+  { q: "What holiday does Seth Cohen invent?", a: ["Thanksgivukkah", "Chrismukkah", "Hallowmas", "Festivus"], c: 1,
+    f: "Chrismukkah – \"eight days of presents, followed by one day of many presents.\"" },
+  { q: "What is the name of Seth's plastic toy horse?", a: ["Princess Sparkle", "Captain Oats", "Sir Gallop", "Mister Hooves"], c: 1,
+    f: "Captain Oats. Princess Sparkle is Summer's horse!" },
+  { q: "What is Seth's sailboat called?", a: ["Summer Breeze", "The Newport", "Atomic County", "Sea Cohen"], c: 0,
+    f: "Summer Breeze – named after you-know-who." },
+  { q: "Which band sings the theme song \"California\"?", a: ["The Killers", "Phantom Planet", "Death Cab for Cutie", "Rooney"], c: 1,
+    f: "Phantom Planet – \"Californiaaaa, here we come!\"" },
+  { q: "What is the name of the music venue where bands play in seasons 2 and 3?", a: ["The Bait Shop", "The Crab Shack", "The Pier", "The Lighthouse"], c: 0,
+    f: "The Bait Shop – Death Cab for Cutie, The Killers and more played there." },
+  { q: "What is the comic book that Seth and Zach create?", a: ["Newport Knights", "Atomic County", "Harbor Heroes", "Orange Crush"], c: 1,
+    f: "Atomic County – with characters based on their friends." },
+  { q: "Who is Kirsten Cohen's rich father?", a: ["Jimmy Cooper", "Caleb Nichol", "Carter Buckley", "Frank Atwood"], c: 1,
+    f: "Caleb Nichol – the head of the Newport Group." },
+  { q: "Who shoots Ryan's brother Trey at the end of season 2?", a: ["Ryan", "Summer", "Marissa", "Seth"], c: 2,
+    f: "Marissa – to save Ryan." },
+  { q: "Who drives Ryan and Marissa off the road in the season 3 finale?", a: ["Johnny Harper", "Luke Ward", "Kevin Volchok", "Oliver Trask"], c: 2,
+    f: "Volchok – the crash leads to Marissa's death." },
+  { q: "What is the name of Marissa's younger sister, who becomes a main character in season 4?", a: ["Kaitlin", "Taylor", "Lindsay", "Sadie"], c: 0,
+    f: "Kaitlin Cooper, played by Willa Holland." },
+  { q: "How many seasons does The O.C. have?", a: ["3", "4", "5", "6"], c: 1,
+    f: "4 seasons, from 2003 to 2007 on Fox." }
+];
+
+let i = 0, score = 0;
+const app = document.getElementById("app");
+
+function start() {
+  app.innerHTML = `
+    <h1>🌴 The O.C. Quiz 🌴</h1>
+    <div class="sub">Made for Mami – Hard Mode. Welcome to the O.C.!</div>
+    <div class="center"><div class="big">🏄</div>
+    <p>${questions.length} questions. Californiaaaa, here we come!</p>
+    <button class="next" onclick="show()">Start</button></div>`;
+}
+
+function show() {
+  const item = questions[i];
+  app.innerHTML = `
+    <div class="progress">Question ${i + 1} of ${questions.length} · Score: ${score}</div>
+    <div class="q">Mami, ${item.q.charAt(0).toLowerCase() + item.q.slice(1)}</div>
+    ${item.a.map((t, k) => `<button class="opt" data-k="${k}">${t}</button>`).join("")}
+    <div class="fb" id="fb"></div>
+    <div id="nav"></div>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.k));
+}
+
+function answer(k) {
+  const item = questions[i];
+  const btns = app.querySelectorAll(".opt");
+  btns.forEach(b => b.disabled = true);
+  btns[item.c].classList.add("right");
+  if (k === item.c) { score++; document.getElementById("fb").textContent = "✨ Correct! " + item.f; }
+  else { btns[k].classList.add("wrong"); document.getElementById("fb").textContent = "Not quite. " + item.f; }
+  document.getElementById("nav").innerHTML =
+    `<button class="next" onclick="next()">${i < questions.length - 1 ? "Next ➜" : "See result"}</button>`;
+}
+
+function next() { i++; i < questions.length ? show() : result(); }
+
+function result() {
+  const pct = score / questions.length;
+  const title = pct === 1 ? "True Newport royalty – Seth Cohen would be proud! 🏆"
+              : pct >= .7 ? "Harbor School honor roll! 🌊"
+              : pct >= .4 ? "Not bad – time for a rewatch at the Bait Shop! 🎸"
+              : "Back to Chino for you, Mami – try again! 🚐";
+  app.innerHTML = `
+    <h1>Well done, Mami!</h1>
+    <div class="center"><div class="big">${score} / ${questions.length}</div>
+    <p>${title}</p>
+    <button class="restart" onclick="i=0;score=0;start()">Play again</button></div>`;
+}
+
+start();
+</script>
+</body>
+</html>
