@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harry Potter Quiz for Melih</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background: radial-gradient(circle at top, #2a1f4d, #0d0a1a); color:#f3e9c6;
+         font-family: Georgia, "Times New Roman", serif; }
+  .card { width:min(92vw, 560px); background:#1b1433; border:2px solid #c9a227; border-radius:16px;
+          padding:28px; box-shadow:0 0 40px rgba(201,162,39,.25); }
+  h1 { margin:0 0 6px; color:#e8c547; font-size:1.7rem; text-align:center; }
+  .sub { text-align:center; opacity:.8; margin-bottom:22px; }
+  .progress { font-size:.9rem; opacity:.75; margin-bottom:8px; }
+  .q { font-size:1.2rem; margin-bottom:18px; }
+  button.opt { display:block; width:100%; text-align:left; margin:8px 0; padding:12px 14px;
+               font:inherit; color:#f3e9c6; background:#2a2050; border:1px solid #5b4b8a;
+               border-radius:10px; cursor:pointer; transition:.15s; }
+  button.opt:hover:not(:disabled) { background:#3a2d6b; }
+  button.opt.right { background:#1f5b3a; border-color:#3fbf7a; }
+  button.opt.wrong { background:#6b1f2a; border-color:#d9475b; }
+  .fb { min-height:1.4em; margin:12px 0; font-style:italic; }
+  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#1b1433;
+                    border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
+  .center { text-align:center; }
+  .big { font-size:3rem; margin:10px 0; }
+</style>
+</head>
+<body>
+<div class="card" id="app"></div>
+<script>
+const questions = [
+  { q: "What is the name of Harry's owl?", a: ["Errol", "Hedwig", "Pigwidgeon", "Fawkes"], c: 1,
+    f: "Hedwig is the snowy owl Hagrid gives Harry for his 11th birthday." },
+  { q: "Which house does the Sorting Hat put Harry in?", a: ["Slytherin", "Ravenclaw", "Gryffindor", "Hufflepuff"], c: 2,
+    f: "Gryffindor – even though the Hat thought about Slytherin!" },
+  { q: "What position does Harry play in Quidditch?", a: ["Keeper", "Beater", "Chaser", "Seeker"], c: 3,
+    f: "Seeker – he's the youngest one in a century." },
+  { q: "Which platform does the Hogwarts Express leave from?", a: ["Platform 7½", "Platform 9¾", "Platform 10¼", "Platform 3"], c: 1,
+    f: "Platform 9¾ at King's Cross station in London." },
+  { q: "What is the name of Hagrid's three-headed dog?", a: ["Fluffy", "Fang", "Norbert", "Buckbeak"], c: 0,
+    f: "Fluffy! (Fang is his boarhound and Norbert is a dragon.)" },
+  { q: "Which spell disarms an opponent?", a: ["Lumos", "Wingardium Leviosa", "Expelliarmus", "Alohomora"], c: 2,
+    f: "Expelliarmus – Harry's favourite spell." },
+  { q: "Who is the Half-Blood Prince?", a: ["Tom Riddle", "Severus Snape", "Sirius Black", "Remus Lupin"], c: 1,
+    f: "Severus Snape – his mother was a witch called Eileen Prince." },
+  { q: "What does the Marauder's Map show?", a: ["Hidden treasure", "The future", "Everyone at Hogwarts and where they are", "The Forbidden Forest only"], c: 2,
+    f: "\"I solemnly swear that I am up to no good.\"" },
+  { q: "What shape is Harry's scar?", a: ["A star", "A lightning bolt", "A snake", "A moon"], c: 1,
+    f: "A lightning bolt – from Voldemort's curse when he was a baby." },
+  { q: "What is Hermione's cat called?", a: ["Crookshanks", "Mrs Norris", "Scabbers", "Trevor"], c: 0,
+    f: "Crookshanks! (Scabbers is Ron's rat, Trevor is Neville's toad.)" }
+];
+
+let i = 0, score = 0;
+const app = document.getElementById("app");
+
+function start() {
+  app.innerHTML = `
+    <h1>⚡ Harry Potter Quiz ⚡</h1>
+    <div class="sub">Made for Melih – are you a true wizard?</div>
+    <div class="center"><div class="big">🧙‍♂️</div>
+    <p>${questions.length} questions. Good luck!</p>
+    <button class="next" onclick="show()">Start</button></div>`;
+}
+
+function show() {
+  const item = questions[i];
+  app.innerHTML = `
+    <div class="progress">Question ${i + 1} of ${questions.length} · Score: ${score}</div>
+    <div class="q">${item.q}</div>
+    ${item.a.map((t, k) => `<button class="opt" data-k="${k}">${t}</button>`).join("")}
+    <div class="fb" id="fb"></div>
+    <div id="nav"></div>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.k));
+}
+
+function answer(k) {
+  const item = questions[i];
+  const btns = app.querySelectorAll(".opt");
+  btns.forEach(b => b.disabled = true);
+  btns[item.c].classList.add("right");
+  if (k === item.c) { score++; document.getElementById("fb").textContent = "✨ Correct! " + item.f; }
+  else { btns[k].classList.add("wrong"); document.getElementById("fb").textContent = "Not quite. " + item.f; }
+  document.getElementById("nav").innerHTML =
+    `<button class="next" onclick="next()">${i < questions.length - 1 ? "Next ➜" : "See result"}</button>`;
+}
+
+function next() { i++; i < questions.length ? show() : result(); }
+
+function result() {
+  const pct = score / questions.length;
+  const title = pct === 1 ? "Order of Merlin, First Class! 🏆"
+              : pct >= .7 ? "Excellent wizard! 🦉"
+              : pct >= .4 ? "Good job, keep practising your spells! 🪄"
+              : "Even Neville started somewhere – try again! 🐸";
+  app.innerHTML = `
+    <h1>Well done, Melih!</h1>
+    <div class="center"><div class="big">${score} / ${questions.length}</div>
+    <p>${title}</p>
+    <button class="restart" onclick="i=0;score=0;start()">Play again</button></div>`;
+}
+
+start();
+</script>
+</body>
+</html>
