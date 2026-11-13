@@ -1,3 +1,3 @@
-# Balatro Jokers Quiz for Melih
+# The O.C. Quiz for Melih
 
-A 13-question quiz about the Jokers in Balatro. Play it at https://bettygshunt.github.io/hp/
+A hard 14-question quiz about the TV show The O.C. Play it at https://bettygshunt.github.io/hp/

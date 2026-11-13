@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Balatro Jokers Quiz for Melih</title>
+<title>The O.C. Quiz for Melih</title>
 <style>
   body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-         background: radial-gradient(circle at top, #4a1520, #120508); color:#eef4f8;
+         background: radial-gradient(circle at top, #e07a3c, #1b2a4a 70%); color:#eef4f8;
          font-family: Georgia, "Times New Roman", serif; }
-  .card { width:min(92vw, 560px); background:#1e0d14; border:2px solid #c9a227; border-radius:16px;
+  .card { width:min(92vw, 560px); background:#132238; border:2px solid #c9a227; border-radius:16px;
           padding:28px; box-shadow:0 0 40px rgba(201,162,39,.25); }
   h1 { margin:0 0 6px; color:#e8c547; font-size:1.7rem; text-align:center; }
   .sub { text-align:center; opacity:.8; margin-bottom:22px; }
   .progress { font-size:.9rem; opacity:.75; margin-bottom:8px; }
   .q { font-size:1.2rem; margin-bottom:18px; }
   button.opt { display:block; width:100%; text-align:left; margin:8px 0; padding:12px 14px;
-               font:inherit; color:#eef4f8; background:#3a1622; border:1px solid #b0394f;
+               font:inherit; color:#eef4f8; background:#1d3556; border:1px solid #4f86c6;
                border-radius:10px; cursor:pointer; transition:.15s; }
-  button.opt:hover:not(:disabled) { background:#52202f; }
+  button.opt:hover:not(:disabled) { background:#284a75; }
   button.opt.right { background:#1f5b3a; border-color:#3fbf7a; }
   button.opt.wrong { background:#6b1f2a; border-color:#d9475b; }
   .fb { min-height:1.4em; margin:12px 0; font-style:italic; }
-  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#1e0d14;
+  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#132238;
                     border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
   .center { text-align:center; }
   .big { font-size:3rem; margin:10px 0; }
@@ -31,32 +31,34 @@
 <div class="card" id="app"></div>
 <script>
 const questions = [
-  { q: "Who created Balatro?", a: ["Supergiant Games", "LocalThunk", "ConcernedApe", "Mega Crit"], c: 1,
-    f: "LocalThunk – a solo developer from Canada. Playstack published it." },
-  { q: "How many Joker slots do you start a run with?", a: ["3", "4", "5", "6"], c: 2,
-    f: "5 Joker slots – a Negative Joker gives you one more." },
-  { q: "What does the basic \"Joker\" card give you?", a: ["+4 Mult", "+30 Chips", "X2 Mult", "$4 per round"], c: 0,
-    f: "+4 Mult – simple but useful early on." },
-  { q: "What does Blueprint do?", a: ["Copies the Joker to its right", "Copies the leftmost Joker", "Doubles all your Chips", "Creates a Tarot card"], c: 0,
-    f: "Blueprint copies the ability of the Joker to its right." },
-  { q: "And what does Brainstorm copy?", a: ["The Joker to its right", "The leftmost Joker", "The last Joker you bought", "A random Joker"], c: 1,
-    f: "Brainstorm copies your leftmost Joker – combine it with Blueprint for big combos!" },
-  { q: "What can happen to Gros Michel at the end of a round?", a: ["It doubles its Mult", "It turns into gold", "It can go extinct (1 in 6 chance)", "It becomes Negative"], c: 2,
-    f: "1 in 6 chance it gets destroyed – the banana goes extinct!" },
-  { q: "After Gros Michel goes extinct, which Joker can show up?", a: ["Ice Cream", "Cavendish", "Popcorn", "Turtle Bean"], c: 1,
-    f: "Cavendish – X3 Mult, with only a 1 in 1000 chance to be destroyed." },
-  { q: "Which of these is NOT a Legendary Joker?", a: ["Perkeo", "Chicot", "Triboulet", "Blueprint"], c: 3,
-    f: "Blueprint is Rare. The Legendaries are Canio, Triboulet, Yorick, Chicot and Perkeo." },
-  { q: "How do you usually get a Legendary Joker?", a: ["Buy it in the shop", "From The Soul Spectral card", "Beat Ante 8", "Sell 5 Jokers"], c: 1,
-    f: "The Soul – a rare Spectral card that creates a Legendary Joker." },
-  { q: "What does Chicot do?", a: ["Disables every Boss Blind", "Gives X2 Mult for Kings and Queens", "Copies consumables", "Gains Mult when cards are destroyed"], c: 0,
-    f: "Chicot disables the effect of every Boss Blind." },
-  { q: "Which Legendary Joker makes played Kings and Queens give X2 Mult?", a: ["Canio", "Yorick", "Triboulet", "Perkeo"], c: 2,
-    f: "Triboulet – the royal jester!" },
-  { q: "What does a Negative edition Joker give you?", a: ["X1.5 Mult", "+50 Chips", "+1 Joker slot", "+$5 sell value"], c: 2,
-    f: "+1 Joker slot – so it basically doesn't take up space." },
-  { q: "What does the Egg Joker do?", a: ["Gains $3 of sell value every round", "Hatches into a Rare Joker", "Gives +10 Mult once", "Adds a card to your deck"], c: 0,
-    f: "Egg gains $3 sell value at the end of every round – sell it later for cash!" }
+  { q: "Who created The O.C.?", a: ["Kevin Williamson", "Josh Schwartz", "Darren Star", "Shonda Rhimes"], c: 1,
+    f: "Josh Schwartz – he later co-created Gossip Girl too." },
+  { q: "Which town is Ryan Atwood originally from?", a: ["Riverside", "Chino", "Fresno", "Long Beach"], c: 1,
+    f: "Chino – \"This is the O.C., not Chino!\"" },
+  { q: "What is Sandy Cohen's job when the show starts?", a: ["Real estate developer", "Surgeon", "Public defender", "High school teacher"], c: 2,
+    f: "A public defender – that's how he meets Ryan." },
+  { q: "What holiday does Seth Cohen invent?", a: ["Thanksgivukkah", "Chrismukkah", "Hallowmas", "Festivus"], c: 1,
+    f: "Chrismukkah – \"eight days of presents, followed by one day of many presents.\"" },
+  { q: "What is the name of Seth's plastic toy horse?", a: ["Princess Sparkle", "Captain Oats", "Sir Gallop", "Mister Hooves"], c: 1,
+    f: "Captain Oats. Princess Sparkle is Summer's horse!" },
+  { q: "What is Seth's sailboat called?", a: ["Summer Breeze", "The Newport", "Atomic County", "Sea Cohen"], c: 0,
+    f: "Summer Breeze – named after you-know-who." },
+  { q: "Which band sings the theme song \"California\"?", a: ["The Killers", "Phantom Planet", "Death Cab for Cutie", "Rooney"], c: 1,
+    f: "Phantom Planet – \"Californiaaaa, here we come!\"" },
+  { q: "What is the name of the music venue where bands play in seasons 2 and 3?", a: ["The Bait Shop", "The Crab Shack", "The Pier", "The Lighthouse"], c: 0,
+    f: "The Bait Shop – Death Cab for Cutie, The Killers and more played there." },
+  { q: "What is the comic book that Seth and Zach create?", a: ["Newport Knights", "Atomic County", "Harbor Heroes", "Orange Crush"], c: 1,
+    f: "Atomic County – with characters based on their friends." },
+  { q: "Who is Kirsten Cohen's rich father?", a: ["Jimmy Cooper", "Caleb Nichol", "Carter Buckley", "Frank Atwood"], c: 1,
+    f: "Caleb Nichol – the head of the Newport Group." },
+  { q: "Who shoots Ryan's brother Trey at the end of season 2?", a: ["Ryan", "Summer", "Marissa", "Seth"], c: 2,
+    f: "Marissa – to save Ryan." },
+  { q: "Who drives Ryan and Marissa off the road in the season 3 finale?", a: ["Johnny Harper", "Luke Ward", "Kevin Volchok", "Oliver Trask"], c: 2,
+    f: "Volchok – the crash leads to Marissa's death." },
+  { q: "What is the name of Marissa's younger sister, who becomes a main character in season 4?", a: ["Kaitlin", "Taylor", "Lindsay", "Sadie"], c: 0,
+    f: "Kaitlin Cooper, played by Willa Holland." },
+  { q: "How many seasons does The O.C. have?", a: ["3", "4", "5", "6"], c: 1,
+    f: "4 seasons, from 2003 to 2007 on Fox." }
 ];
 
 let i = 0, score = 0;
@@ -64,10 +66,10 @@ const app = document.getElementById("app");
 
 function start() {
   app.innerHTML = `
-    <h1>🃏 Balatro Jokers Quiz 🃏</h1>
-    <div class="sub">Made for Melih – do you know your Jokers?</div>
-    <div class="center"><div class="big">🃏</div>
-    <p>${questions.length} questions. Let's see that Mult!</p>
+    <h1>🌴 The O.C. Quiz 🌴</h1>
+    <div class="sub">Made for Melih – Hard Mode. Welcome to the O.C.!</div>
+    <div class="center"><div class="big">🏄</div>
+    <p>${questions.length} questions. Californiaaaa, here we come!</p>
     <button class="next" onclick="show()">Start</button></div>`;
 }
 
@@ -97,10 +99,10 @@ function next() { i++; i < questions.length ? show() : result(); }
 
 function result() {
   const pct = score / questions.length;
-  const title = pct === 1 ? "Gold Stake champion! 🏆"
-              : pct >= .7 ? "Huge Mult! You'd beat Ante 8! 🔥"
-              : pct >= .4 ? "Not bad – but the Boss Blind is waiting! 🎲"
-              : "Game over on Ante 1 – shuffle and try again, Melih! 🃏";
+  const title = pct === 1 ? "True Newport royalty – Seth Cohen would be proud! 🏆"
+              : pct >= .7 ? "Harbor School honor roll! 🌊"
+              : pct >= .4 ? "Not bad – time for a rewatch at the Bait Shop! 🎸"
+              : "Back to Chino for you, Melih – try again! 🚐";
   app.innerHTML = `
     <h1>Well done, Melih!</h1>
     <div class="center"><div class="big">${score} / ${questions.length}</div>
