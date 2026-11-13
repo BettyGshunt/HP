@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escape from Snape's Dungeon</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; background:#07060c; color:#efe6c8; font-family: Georgia, "Times New Roman", serif;
+         display:flex; flex-direction:column; align-items:center; min-height:100vh; }
+  header { width:min(98vw,1100px); display:flex; justify-content:space-between; align-items:center; padding:10px 4px; }
+  header h1 { font-size:1.3rem; margin:0; color:#e8c547; }
+  .hud { display:flex; gap:10px; align-items:center; }
+  .btn { background:#c9a227; color:#1b1433; border:none; border-radius:8px; padding:7px 14px; font:inherit; font-weight:bold; cursor:pointer; }
+  .btn.ghost { background:transparent; color:#e8c547; border:1px solid #c9a227; }
+  #timer { font-variant-numeric: tabular-nums; opacity:.85; }
+
+  /* ---------- ROOM ---------- */
+  #stage { position:relative; width:min(98vw,1100px); aspect-ratio: 16/9; border:2px solid #4a3d1e; border-radius:12px; overflow:hidden;
+           background:
+             linear-gradient(180deg, #1d2a24 0%, #16201b 60%, #2b2116 60%, #1a130c 100%); user-select:none; }
+  #stage::before { content:""; position:absolute; inset:0 0 40% 0;
+    background-image: linear-gradient(90deg, rgba(0,0,0,.25) 1px, transparent 1px), linear-gradient(rgba(0,0,0,.25) 1px, transparent 1px);
+    background-size: 60px 30px; opacity:.6; pointer-events:none; }
+  #stage::after { content:""; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(ellipse at 30% 55%, rgba(255,140,40,.12), transparent 45%), radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,.65)); }
+  .hot { position:absolute; cursor:pointer; transition: filter .15s, transform .15s; }
+  .hot:hover { filter: brightness(1.35) drop-shadow(0 0 6px rgba(232,197,71,.6)); }
+  .label { position:absolute; left:50%; bottom:-22px; transform:translateX(-50%); font-size:.7rem; white-space:nowrap; opacity:0; transition:.15s;
+           background:rgba(0,0,0,.7); padding:2px 6px; border-radius:4px; pointer-events:none; }
+  .hot:hover .label { opacity:1; }
+
+  #bookshelf { left:2%; top:7%; width:16%; height:60%; background:#3b2414; border:6px solid #24150b; border-radius:4px;
+               display:grid; grid-template-rows: repeat(4,1fr); padding:4px; gap:4px; }
+  #bookshelf .row { border-bottom:5px solid #24150b; display:flex; align-items:flex-end; gap:2px; padding:0 3px; }
+  #bookshelf .bk { width:9%; border-radius:2px 2px 0 0; }
+  #portrait { left:22%; top:8%; width:10%; height:24%; background: linear-gradient(#2c3b2a,#1a2419); border:7px solid #a8862a; border-radius:6px;
+              display:flex; align-items:center; justify-content:center; font-size:3rem; }
+  #blackboard { left:36%; top:8%; width:22%; height:20%; background:#1f2b22; border:8px solid #5a3b1c; border-radius:4px;
+                color:#dfe9dd; font-size:.75rem; padding:6px; font-family: "Comic Sans MS", cursive; line-height:1.3; }
+  #window { left:62%; top:8%; width:10%; height:22%; background: radial-gradient(circle at 70% 30%, #f5f1c8 0 9%, #23365a 10%, #0b1424);
+            border:6px solid #3a3a3a; border-radius:50% 50% 4px 4px; }
+  #window::after { content:""; position:absolute; inset:0; background: linear-gradient(90deg, transparent 47%, #3a3a3a 47% 53%, transparent 53%),
+            linear-gradient(transparent 47%, #3a3a3a 47% 53%, transparent 53%); }
+  #fireplace { left:21%; top:36%; width:16%; height:28%; background:#2a2a2a; border:8px solid #4b4b4b; border-bottom:none; border-radius:6px 6px 0 0;
+               display:flex; align-items:flex-end; justify-content:center; font-size:2.6rem; }
+  #fireplace span { animation: flicker 1.2s infinite alternate; }
+  @keyframes flicker { from { transform: scale(1); opacity:.9 } to { transform: scale(1.08) translateY(-2px); opacity:1 } }
+  #cauldron { left:42%; top:44%; width:12%; height:22%; display:flex; align-items:flex-end; justify-content:center; font-size:4.2rem; }
+  #cauldron .pot { width:100%; height:70%; background: radial-gradient(ellipse at 50% 15%, #3b6b3b 0 30%, #111 32%); border-radius: 10% 10% 50% 50%;
+                   border:4px solid #2b2b2b; position:relative; }
+  #cauldron .pot::before { content:"~ ~ ~"; position:absolute; top:-26px; left:0; right:0; text-align:center; color:#9fd59f; font-size:1rem; opacity:.6; animation: steam 2s infinite; }
+  @keyframes steam { from { transform: translateY(4px); opacity:.2 } to { transform: translateY(-8px); opacity:.7 } }
+  #cabinet { left:65%; top:31%; width:12%; height:36%; background: linear-gradient(90deg,#4a2f1a 49%, #2a190c 49% 51%, #4a2f1a 51%);
+             border:5px solid #2a190c; border-radius:4px; }
+  #cabinet::after { content:"🔒"; position:absolute; left:50%; top:45%; transform:translate(-50%,-50%); font-size:1.1rem; }
+  #cabinet.open::after { content:"🔓"; }
+  #door { left:81%; top:16%; width:16%; height:52%; background: repeating-linear-gradient(90deg,#3d2a17 0 18px,#33230f 18px 20px);
+          border:7px solid #1c140a; border-radius: 50% 50% 0 0 / 22% 22% 0 0; }
+  #door::after { content:"✦ ✦ ✦ ✦"; position:absolute; top:42%; left:0; right:0; text-align:center; color:#c9a227; font-size:.9rem; }
+  #desk { left:36%; top:74%; width:28%; height:20%; background: linear-gradient(#5b3a1e 0 22%, #3f2713 22%); border-radius:4px;
+          display:flex; align-items:center; justify-content:center; }
+  #desk .drawer { width:34%; height:36%; margin-top:14%; border:3px solid #26170a; background:#4a2f17; border-radius:3px; text-align:center; font-size:.8rem; }
+  #candle { left:38.5%; top:65%; width:4%; height:10%; font-size:2rem; display:flex; align-items:flex-end; justify-content:center; }
+  #rug { left:6%; top:80%; width:26%; height:15%; background: repeating-linear-gradient(45deg,#5a1a1a 0 10px,#7a2a1f 10px 20px);
+         border:4px solid #c9a227; border-radius:6px; transform: perspective(300px) rotateX(35deg); }
+  #rug.lifted { clip-path: polygon(0 0, 100% 0, 100% 55%, 78% 100%, 0 100%); }
+  #jar { left:12%; top:69%; width:5%; height:10%; font-size:2rem; }
+  #chair { left:68%; top:72%; width:9%; height:20%; font-size:3.4rem; display:flex; align-items:flex-end; justify-content:center; }
+
+  /* ---------- MESSAGE + INVENTORY ---------- */
+  #msg { width:min(98vw,1100px); min-height:52px; margin-top:8px; padding:10px 14px; background:#15111f; border:1px solid #4a3d1e; border-radius:10px; font-style:italic; }
+  #inv { width:min(98vw,1100px); display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 20px; min-height:76px; padding:8px; background:#100d18; border:1px solid #4a3d1e; border-radius:10px; }
+  #inv .empty { opacity:.5; font-style:italic; align-self:center; padding-left:6px; }
+  .item { width:76px; height:60px; background:#221a35; border:2px solid #4b3d6e; border-radius:8px; cursor:pointer; display:flex; flex-direction:column;
+          align-items:center; justify-content:center; font-size:1.6rem; position:relative; }
+  .item small { font-size:.55rem; text-align:center; line-height:1.05; margin-top:2px; }
+  .item.sel { border-color:#e8c547; box-shadow:0 0 10px #e8c547; }
+  #selhint { opacity:.75; font-size:.85rem; width:min(98vw,1100px); text-align:right; margin-top:-4px; }
+
+  /* ---------- MODAL ---------- */
+  #overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); display:none; align-items:center; justify-content:center; z-index:10; }
+  #modal { background:#1b1433; border:2px solid #c9a227; border-radius:14px; padding:22px; width:min(94vw,640px); max-height:92vh; overflow:auto; position:relative; }
+  #modal h2 { margin:0 0 12px; color:#e8c547; }
+  #closeM { position:absolute; top:10px; right:14px; background:none; border:none; color:#e8c547; font-size:1.4rem; cursor:pointer; }
+  .books { display:flex; gap:6px; align-items:flex-end; height:190px; padding:10px; background:#2a190c; border-bottom:10px solid #1a0f06; border-radius:4px; }
+  .book { writing-mode: vertical-rl; transform: rotate(180deg); padding:8px 4px; border-radius:3px; cursor:pointer; font-size:.8rem; color:#f6efd8; border:1px solid rgba(0,0,0,.4); }
+  .book:hover { filter:brightness(1.3); }
+  .paper { background:#efe2b8; color:#3b2a14; padding:14px 16px; border-radius:6px; margin-top:12px; font-style:italic; line-height:1.45; }
+  .dials { display:flex; gap:14px; justify-content:center; margin:18px 0; }
+  .dial { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .dial button { background:#2a2050; color:#e8c547; border:1px solid #5b4b8a; border-radius:6px; width:52px; cursor:pointer; font-size:1rem; }
+  .dial .face { width:64px; height:64px; background:#0f0b1c; border:2px solid #c9a227; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:2rem; }
+  .center { text-align:center; }
+  input.pw { font:inherit; padding:8px 10px; border-radius:8px; border:1px solid #5b4b8a; background:#0f0b1c; color:#efe6c8; width:70%; }
+  .shelfgrid { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:12px 0; }
+  .take { background:#2a2050; border:1px solid #5b4b8a; color:#efe6c8; border-radius:10px; padding:10px; cursor:pointer; font:inherit; min-width:96px; }
+  .take span { font-size:2rem; display:block; }
+
+  /* puzzle */
+  .pgrid { display:grid; grid-template-columns: repeat(3, 120px); grid-template-rows: repeat(2,120px); gap:3px; justify-content:center; background:#0f0b1c; padding:6px; border-radius:8px; width:max-content; margin:0 auto; }
+  .slot { width:120px; height:120px; border:2px dashed #4b3d6e; border-radius:4px; display:flex; align-items:center; justify-content:center; }
+  .piece { width:116px; height:116px; background-size:cover; cursor:pointer; border-radius:3px; transition: transform .2s; box-shadow:0 2px 6px rgba(0,0,0,.6); }
+  .piece.sel { outline:3px solid #e8c547; }
+  .tray { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; min-height:124px; margin-top:12px; padding:6px; border:1px solid #4b3d6e; border-radius:8px; }
+  .small { font-size:.85rem; opacity:.8; }
+
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .shake { animation: shake .3s 2; }
+</style>
+</head>
+<body>
+<header>
+  <h1>⚡ Escape from Snape's Dungeon</h1>
+  <div class="hud"><span id="timer">00:00</span><button class="btn ghost" id="hintBtn">🦉 Hint</button></div>
+</header>
+
+<div id="stage">
+  <div class="hot" id="bookshelf" data-o="bookshelf"><div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div><div class="label">Bookshelf</div></div>
+  <div class="hot" id="portrait" data-o="portrait">🧔<div class="label">Portrait</div></div>
+  <div class="hot" id="blackboard" data-o="blackboard">Homework: 12 inches on bezoars.<br>Reminder to self: drawer combination = the number of Potter's vault at Gringotts.<br>— S.S.<div class="label">Blackboard</div></div>
+  <div class="hot" id="window" data-o="window"><div class="label">Window</div></div>
+  <div class="hot" id="fireplace" data-o="fireplace"><span>🔥</span><div class="label">Fireplace</div></div>
+  <div class="hot" id="cabinet" data-o="cabinet"><div class="label">Potion cupboard</div></div>
+  <div class="hot" id="door" data-o="door"><div class="label">Door</div></div>
+  <div class="hot" id="cauldron" data-o="cauldron"><div class="pot"></div><div class="label">Cauldron</div></div>
+  <div class="hot" id="desk" data-o="desk"><div class="drawer">🔢</div><div class="label">Snape's desk</div></div>
+  <div class="hot" id="candle" data-o="candle">🕯️<div class="label">Candle</div></div>
+  <div class="hot" id="rug" data-o="rug"><div class="label">Rug</div></div>
+  <div class="hot" id="jar" data-o="jar">🫙<div class="label">Jar</div></div>
+  <div class="hot" id="chair" data-o="chair">🪑<div class="label">Chair</div></div>
+</div>
+
+<div id="msg">Melih, you've been locked in Professor Snape's dungeon after detention! The door is sealed with a strange lock of four symbols. Search the room, collect what you find and escape before Snape returns...</div>
+<div id="selhint"></div>
+<div id="inv"></div>
+
+<div id="overlay"><div id="modal"><button id="closeM">✕</button><div id="mbody"></div></div></div>
+
+<script>
+// ---------------- STATE ----------------
+const S = {
+  inv: [], sel: null, pieces: 0, f: {}, potionSeq: [], drawer: [0,0,0], door: [0,0,0,0],
+  puzzle: [], start: Date.now(), done: false
+};
+const SYMS = ['⚡','🦉','🐍','🦁','🦡','🦅'];
+const CODE = ['🦉','🐍','⚡','🦡'];
+const POTION_ORDER = ['red','yellow','blue','green'];
+const ITEMS = {
+  key:      { icon:'🗝️', name:'Silver key', desc:'A small, soot-covered silver key. It looks like it fits a cupboard.' },
+  red:      { icon:'🧪', name:'Red essence', desc:'A bottle of glowing red liquid. Label: "Essence of Courage".', color:'#d33' },
+  yellow:   { icon:'🧪', name:'Yellow essence', desc:'A bottle of warm yellow liquid. Label: "Essence of Loyalty".', color:'#e8c547' },
+  blue:     { icon:'🧪', name:'Blue essence', desc:'A bottle of deep blue liquid. Label: "Essence of Wisdom".', color:'#3b6fd8' },
+  green:    { icon:'🧪', name:'Green essence', desc:'A bottle of shimmering green liquid. Label: "Essence of Ambition".', color:'#2e9e55' },
+  candle:   { icon:'🕯️', name:'Candle', desc:'A lit candle. Its flame is surprisingly warm...' },
+  parchment:{ icon:'📜', name:'Blank parchment', desc:'A completely blank piece of parchment. Strange — it feels slightly waxy. Maybe heat would reveal something?' },
+  secret:   { icon:'📜', name:'Revealed parchment', desc:'Brown letters appeared in the heat: "Phineas guards the last piece. Give him the password Harry once used for Gryffindor Tower: MIMBULUS MIMBLETONIA."' },
+  pieces:   { icon:'🧩', name:'Map pieces', desc:'Torn pieces of an old parchment. Click to try to put them together.' }
+};
+
+// decorate bookshelf
+document.querySelectorAll('#bookshelf .row').forEach(r => {
+  const cols = ['#7a1f1f','#1f4a7a','#2e6b3a','#7a5a1f','#4a1f6b','#6b3a1f','#2a2a5a'];
+  for (let i=0;i<8;i++){ const b=document.createElement('div'); b.className='bk';
+    b.style.height=(55+Math.random()*40)+'%'; b.style.background=cols[(i+r.childElementCount*3+Math.floor(Math.random()*7))%7]; r.appendChild(b); }
+});
+
+// ---------------- HELPERS ----------------
+const $ = id => document.getElementById(id);
+function say(t){ $('msg').innerHTML = t; }
+function has(id){ return S.inv.includes(id); }
+function add(id){ if(id==='piece'){ S.pieces++; if(!has('pieces')) S.inv.push('pieces'); } else if(!has(id)) S.inv.push(id); renderInv(); }
+function remove(id){ S.inv = S.inv.filter(x=>x!==id); if(S.sel===id) S.sel=null; renderInv(); }
+function renderInv(){
+  const el=$('inv'); el.innerHTML='';
+  if(!S.inv.length){ el.innerHTML='<span class="empty">Your pockets are empty.</span>'; }
+  S.inv.forEach(id=>{
+    const it=ITEMS[id]; const d=document.createElement('div'); d.className='item'+(S.sel===id?' sel':'');
+    const label = id==='pieces' ? `Map pieces (${S.pieces}/6)` : it.name;
+    d.innerHTML = `<span style="${it.color?`filter:drop-shadow(0 0 6px ${it.color})`:''}">${it.icon}</span><small>${label}</small>`;
+    d.onclick=()=>clickItem(id); el.appendChild(d);
+  });
+  $('selhint').textContent = S.sel ? `Holding: ${ITEMS[S.sel].name} — click something in the room to use it (click the item again to inspect it).` : '';
+}
+function clickItem(id){
+  if(id==='pieces'){ S.sel=null; renderInv(); openPuzzle(); return; }
+  if(S.sel && S.sel!==id){
+    // combine
+    if((S.sel==='candle'&&id==='parchment')||(S.sel==='parchment'&&id==='candle')){
+      remove('parchment'); add('secret'); S.sel=null; renderInv();
+      say('You hold the parchment over the candle flame... brown letters slowly appear! 🔥📜 (Click the revealed parchment to read it.)');
+      return;
+    }
+    S.sel=id; renderInv(); say(`You take out the ${ITEMS[id].name}.`); return;
+  }
+  if(S.sel===id){ S.sel=null; renderInv(); say(`<b>${ITEMS[id].name}:</b> ${ITEMS[id].desc}`); return; }
+  S.sel=id; renderInv(); say(`You take out the ${ITEMS[id].name}. ${ITEMS[id].desc}`);
+}
+function modal(title, html){ $('mbody').innerHTML = `<h2>${title}</h2>${html}`; $('overlay').style.display='flex'; }
+function closeModal(){ $('overlay').style.display='none'; }
+$('closeM').onclick=closeModal;
+$('overlay').onclick=e=>{ if(e.target.id==='overlay') closeModal(); };
+function shake(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+function gotPiece(where){ add('piece'); say(`🧩 You found a torn piece of parchment ${where}! (${S.pieces}/6)` + (S.pieces===6?' That\'s all of them — click "Map pieces" to put them together!':'')); }
+
+// ---------------- ROOM OBJECTS ----------------
+const OBJ = {
+  rug(){
+    if(S.sel){ return say("Hitting the rug with that won't help."); }
+    if(!S.f.rug){ S.f.rug=true; $('rug').classList.add('lifted'); gotPiece('under the corner of the rug'); }
+    else say('Just dusty stone floor under the rug now.');
+  },
+  jar(){ say('A jar of pickled... something. It has eyes. 🤢 There\'s nothing useful in it — and you\'re NOT putting your hand in there.'); },
+  chair(){ say('Snape\'s chair. Someone has carved "S.S. ❤ L.E." into the underside. How... unexpected. Nothing else here.'); },
+  window(){ say('A high, barred window. Outside you can see the Black Lake glowing in the moonlight. A giant squid waves a tentacle. No way out here.'); },
+  blackboard(){ say('The blackboard says: <b>"Reminder to self: drawer combination = the number of Potter\'s vault at Gringotts."</b> Hmm... do you remember it, Melih?'); },
+  fireplace(){
+    if(S.sel==='parchment'){ return say('You hold the parchment near the fire, but it\'s too hot — you nearly burn your fingers! Maybe a smaller flame would work better.'); }
+    if(!S.f.key){ S.f.key=true; add('key'); say('You poke around in the ashes at the edge of the fire... something glints! You pull out a small <b>silver key</b>. 🗝️'); }
+    else say('The fire crackles. Nothing else in the ashes.');
+  },
+  candle(){
+    if(!S.f.candle){ S.f.candle=true; $('candle').style.display='none'; add('candle'); say('You take the lit <b>candle</b> from Snape\'s desk. 🕯️'); }
+  },
+  cabinet(){
+    if(!S.f.cabinet){
+      if(S.sel==='key'){ S.f.cabinet=true; remove('key'); $('cabinet').classList.add('open'); say('The silver key turns with a click. The potion cupboard swings open!'); return openCabinet(); }
+      shake($('cabinet')); return say('The potion cupboard is locked. There\'s a small silver keyhole.');
+    }
+    openCabinet();
+  },
+  bookshelf(){ openShelf(); },
+  cauldron(){
+    const p=S.sel;
+    if(p && ITEMS[p].color){
+      remove(p); S.potionSeq.push(p);
+      const ok = S.potionSeq.every((x,i)=>x===POTION_ORDER[i]);
+      if(!ok){
+        const back=[...S.potionSeq]; S.potionSeq=[]; back.forEach(add);
+        shake($('cauldron'));
+        return say('💥 POOF! The cauldron spits out a cloud of purple smoke. Wrong order! The bottles magically refill and fly back into your pockets.');
+      }
+      if(S.potionSeq.length===4){ S.f.cauldron=true; say('✨ The potion turns pure gold and bubbles over... A fireproof piece of parchment floats up out of the cauldron!'); gotPiece('in the golden potion'); return; }
+      return say(`You pour in the ${ITEMS[p].name}. The potion swirls happily... (${S.potionSeq.length}/4)`);
+    }
+    if(S.f.cauldron) return say('The golden potion glitters. You\'ve done everything you can here.');
+    if(p) return say('You can\'t brew anything with that.');
+    say('A big pewter cauldron sits over a low fire. Something is engraved on the rim: <i>"Four essences, in the right order..."</i>');
+  },
+  desk(){ openDrawer(); },
+  portrait(){ openPortrait(); },
+  door(){ openDoor(); }
+};
+document.querySelectorAll('.hot').forEach(h=>h.addEventListener('click',()=>OBJ[h.dataset.o]()));
+
+// ---------------- CLOSE-UPS ----------------
+function openShelf(){
+  const books=[
+    ['Hogwarts: A History','#7a1f1f','hist'],['Advanced Potion-Making','#2e6b3a','apm'],['Quidditch Through the Ages','#1f4a7a','q'],
+    ['The Monster Book of Monsters','#5a3b1c','mon'],['Fantastic Beasts','#4a1f6b','fb'],['One Thousand Magical Herbs and Fungi','#6b5a1f','herb'],['Defensive Magical Theory','#3a3a3a','dmt']
+  ];
+  modal('📚 The Bookshelf', `<div class="books">${books.map(b=>`<div class="book" data-b="${b[2]}" style="background:${b[1]};height:${130+Math.random()*50}px">${b[0]}</div>`).join('')}</div><div id="bookOut" class="small" style="margin-top:10px">Click a book to pull it out.</div>`);
+  document.querySelectorAll('.book').forEach(b=>b.onclick=()=>{
+    const o=$('bookOut'); const k=b.dataset.b;
+    if(k==='hist'){ if(!S.f.hist){ S.f.hist=true; o.innerHTML='Something falls out from between the pages!'; gotPiece('inside "Hogwarts: A History"'); } else o.innerHTML='Hermione would love this book. Nothing else inside.'; }
+    if(k==='apm'){ S.f.note=true; o.innerHTML=`An old, scribbled-in copy. On the page about house essences, someone has written in the margin:
+      <div class="paper">"Add the four essences as the Sorting Hat names the founders' virtues: first the <b>brave</b>, then the <b>loyal</b>, then the <b>wise</b>, and last the <b>cunning</b>."<br><span style="float:right">— The Half-Blood Prince</span><br></div>`; }
+    if(k==='mon'){ o.innerHTML='GRRRR! The book snaps at your fingers! 📕🦷 You quickly shove it back. (Should have stroked the spine...)'; shake(b); }
+    if(k==='q'){ o.innerHTML='A library stamp: "Property of Hogwarts Library. Do not remove." Nothing inside.'; }
+    if(k==='fb'){ o.innerHTML='A bookmark at the page about Nifflers: "Attracted to anything shiny." Nothing else.'; }
+    if(k==='herb'){ o.innerHTML='A pressed piece of Gillyweed falls out. Interesting, but not helpful here.'; }
+    if(k==='dmt'){ o.innerHTML='Pages and pages of boring theory. Umbridge would approve. Nothing here.'; }
+  });
+}
+function openCabinet(){
+  const avail = ['red','yellow','blue','green'].filter(c=>!S.f['took_'+c]);
+  const pieceHere = !S.f.cabPiece;
+  modal('🧪 Potion Cupboard', `<p>Dusty shelves with jars of beetle eyes, dried lionfish spines... and:</p>
+    <div class="shelfgrid">
+      ${avail.map(c=>`<button class="take" data-t="${c}"><span style="filter:drop-shadow(0 0 8px ${ITEMS[c].color})">🧪</span>${ITEMS[c].name}</button>`).join('')}
+      ${pieceHere?'<button class="take" data-t="piece"><span>🧩</span>Torn parchment</button>':''}
+    </div>${!avail.length&&!pieceHere?'<p class="small">The cupboard is empty now.</p>':'<p class="small">Click to take things.</p>'}`);
+  document.querySelectorAll('.take').forEach(b=>b.onclick=()=>{
+    const t=b.dataset.t;
+    if(t==='piece'){ S.f.cabPiece=true; gotPiece('behind the jars in the cupboard'); }
+    else { S.f['took_'+t]=true; add(t); say(`You take the ${ITEMS[t].name}.`); }
+    b.remove();
+  });
+}
+function dialHTML(vals, faces, prefix){
+  return `<div class="dials">${vals.map((v,i)=>`<div class="dial"><button data-d="${prefix}${i}" data-dir="1">▲</button><div class="face" id="${prefix}f${i}">${faces[v]}</div><button data-d="${prefix}${i}" data-dir="-1">▼</button></div>`).join('')}</div>`;
+}
+function wireDials(arr, faces, prefix){
+  document.querySelectorAll(`[data-d^="${prefix}"]`).forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.d.slice(prefix.length); arr[i]=(arr[i]+ +b.dataset.dir+faces.length)%faces.length; $(prefix+'f'+i).textContent=faces[arr[i]];
+  });
+}
+function openDrawer(){
+  if(S.f.drawer){
+    const left = !S.f.drawerPiece || !S.f.parchTaken;
+    modal('🗄️ Snape\'s Desk Drawer', `<p>The drawer is open.</p><div class="shelfgrid">
+      ${!S.f.drawerPiece?'<button class="take" data-t="piece"><span>🧩</span>Torn parchment</button>':''}
+      ${!S.f.parchTaken?'<button class="take" data-t="parchment"><span>📜</span>Blank parchment</button>':''}
+      </div>${left?'':'<p class="small">Only a few broken quills left.</p>'}`);
+    document.querySelectorAll('.take').forEach(b=>b.onclick=()=>{
+      if(b.dataset.t==='piece'){ S.f.drawerPiece=true; gotPiece('in Snape\'s drawer'); }
+      else { S.f.parchTaken=true; add('parchment'); say('You take the <b>blank parchment</b>. Odd — why would Snape lock away an empty page?'); }
+      b.remove();
+    });
+    return;
+  }
+  const digits=[...Array(10).keys()].map(String);
+  modal('🔢 Snape\'s Desk Drawer', `<p>The drawer has a three-number combination lock.</p>${dialHTML(S.drawer,digits,'dr')}
+    <div class="center"><button class="btn" id="tryDr">Pull the drawer</button></div><p id="drOut" class="center small"></p>`);
+  wireDials(S.drawer,digits,'dr');
+  $('tryDr').onclick=()=>{
+    if(S.drawer.join('')==='687'){ S.f.drawer=true; say('Click! The drawer slides open.'); openDrawer(); }
+    else { $('drOut').textContent='It won\'t budge.'; shake($('modal')); }
+  };
+}
+function openPortrait(){
+  if(S.f.portrait){
+    modal('🖼️ Phineas Nigellus Black', `<p>The portrait has swung open like a door, revealing a small hollow in the wall.</p>${!S.f.portPiece?'<div class="shelfgrid"><button class="take" data-t="piece"><span>🧩</span>Torn parchment</button></div>':'<p class="small">The hollow is empty.</p>'}`);
+    document.querySelectorAll('.take').forEach(b=>b.onclick=()=>{ S.f.portPiece=true; gotPiece('hidden behind the portrait'); b.remove(); });
+    return;
+  }
+  modal('🖼️ Phineas Nigellus Black', `<p>The painted wizard looks down his nose at you. <i>"Hmph. A student. I suppose you want something. I open only for those who know the <b>password</b>."</i></p>
+    <div class="center"><input class="pw" id="pw" placeholder="Say the password..." autocomplete="off"> <button class="btn" id="pwGo">Say it</button></div><p id="pwOut" class="center small"></p>`);
+  const go=()=>{
+    const v=$('pw').value.trim().toLowerCase().replace(/\s+/g,' ');
+    if(v==='mimbulus mimbletonia'){ S.f.portrait=true; say('<i>"Hmph... correct. How tiresome."</i> The portrait swings open!'); openPortrait(); }
+    else { $('pwOut').innerHTML='<i>"Wrong! Off with you, you ignorant child."</i>'; shake($('modal')); }
+  };
+  $('pwGo').onclick=go; $('pw').onkeydown=e=>{ if(e.key==='Enter') go(); }; setTimeout(()=>{ const e=$('pw'); if(e) e.focus(); },50);
+}
+function openDoor(){
+  modal('🚪 The Dungeon Door', `<p>The heavy door has no handle — only four golden dials with magical symbols. A brass plate reads: <i>"Only the four signs from the torn map shall open me."</i></p>
+    ${dialHTML(S.door,SYMS,'dd')}<div class="center"><button class="btn" id="tryDoor">Push the door</button></div><p id="doorOut" class="center small"></p>`);
+  wireDials(S.door,SYMS,'dd');
+  $('tryDoor').onclick=()=>{
+    if(S.door.map(i=>SYMS[i]).join('')===CODE.join('')) win();
+    else { $('doorOut').textContent='The dials glow red for a moment. The door stays shut.'; shake($('modal')); }
+  };
+}
+
+// ---------------- PUZZLE ----------------
+const PIECE_IMG = (()=>{
+  const W=600,H=400,c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d');
+  const grd=g.createRadialGradient(300,200,40,300,200,380); grd.addColorStop(0,'#f3e6bd'); grd.addColorStop(1,'#c9ad6e'); g.fillStyle=grd; g.fillRect(0,0,W,H);
+  g.strokeStyle='#7a5a2a'; g.lineWidth=6; g.strokeRect(14,14,W-28,H-28); g.lineWidth=2; g.strokeRect(26,26,W-52,H-52);
+  g.fillStyle='#5a3a14'; g.textAlign='center'; g.font='italic bold 30px Georgia'; g.fillText('The door obeys four signs:',300,82);
+  g.font='italic 20px Georgia'; g.fillText('read them from left to right',300,112);
+  const xs=[105,235,365,495]; const nums=['I','II','III','IV'];
+  CODE.forEach((s,i)=>{
+    g.font='bold 22px Georgia'; g.fillStyle='#5a3a14'; g.fillText(nums[i],xs[i],160);
+    g.beginPath(); g.arc(xs[i],222,56,0,Math.PI*2); g.fillStyle='rgba(122,90,42,.15)'; g.fill(); g.strokeStyle='#7a5a2a'; g.lineWidth=3; g.stroke();
+    g.fillStyle='#3b2410'; g.font='72px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",serif'; g.textBaseline='middle'; g.fillText(s,xs[i],226); g.textBaseline='alphabetic';
+  });
+  g.fillStyle='#5a3a14'; g.font='italic 22px Georgia'; g.fillText('"Mischief Managed" — M. W. P. & P.',300,338);
+  const out=[]; for(let i=0;i<6;i++){ const p=document.createElement('canvas'); p.width=200; p.height=200;
+    p.getContext('2d').drawImage(c,(i%3)*200,Math.floor(i/3)*200,200,200,0,0,200,200); out.push(p.toDataURL()); }
+  return out;
+})();
+// piece order in which they are found -> image index (shuffled so it's not obvious)
+const FIND_ORDER=[4,1,5,0,3,2];
+let puzzleSel=null;
+function syncPuzzle(){
+  while(S.puzzle.length<S.pieces){ const img=FIND_ORDER[S.puzzle.length]; S.puzzle.push({img, slot:null, rot:1+Math.floor(Math.random()*3)}); }
+}
+function openPuzzle(){
+  syncPuzzle();
+  const p=S.puzzle;
+  const pieceEl=(pc,idx)=>`<div class="piece${puzzleSel===idx?' sel':''}" data-p="${idx}" style="background-image:url(${PIECE_IMG[pc.img]});transform:rotate(${pc.rot*90}deg)"></div>`;
+  const slots=[...Array(6).keys()].map(s=>{ const idx=p.findIndex(x=>x.slot===s); return `<div class="slot" data-s="${s}">${idx>-1?pieceEl(p[idx],idx):''}</div>`; }).join('');
+  const tray=p.map((pc,idx)=>pc.slot===null?pieceEl(pc,idx):'').join('');
+  modal('🧩 The Torn Map', `<p class="small">Click a piece to pick it up, then click an empty square to place it. Click the picked-up piece <b>again</b> to rotate it. Click a placed piece while holding another to swap them.</p>
+    <div class="pgrid">${slots}</div><div class="tray">${tray||'<span class="small" style="align-self:center">No loose pieces.</span>'}</div>
+    <p class="center small">${S.pieces<6?`You have ${S.pieces} of 6 pieces. Keep searching the room!`:''} ${puzzleSel!==null&&p[puzzleSel].slot!==null?'<button class="btn ghost" id="toTray">Back to tray</button>':''}</p><div id="pzOut" class="center"></div>`);
+  document.querySelectorAll('.piece').forEach(el=>el.onclick=e=>{
+    e.stopPropagation(); const idx=+el.dataset.p;
+    if(puzzleSel===idx){ p[idx].rot=(p[idx].rot+1)%4; }
+    else if(puzzleSel!==null && p[idx].slot!==null){ const a=p[puzzleSel].slot; p[puzzleSel].slot=p[idx].slot; p[idx].slot=a; puzzleSel=null; }
+    else puzzleSel=idx;
+    openPuzzle(); checkPuzzle();
+  });
+  document.querySelectorAll('.slot').forEach(el=>el.onclick=()=>{
+    const s=+el.dataset.s; if(puzzleSel===null) return;
+    if(p.some(x=>x.slot===s)) return;
+    p[puzzleSel].slot=s; puzzleSel=null; openPuzzle(); checkPuzzle();
+  });
+  const tt=$('toTray'); if(tt) tt.onclick=()=>{ p[puzzleSel].slot=null; puzzleSel=null; openPuzzle(); };
+  if(S.f.puzzle) showSolved();
+}
+function checkPuzzle(){
+  if(S.pieces<6||S.f.puzzle) return;
+  if(S.puzzle.every(x=>x.slot===x.img && x.rot%4===0)){ S.f.puzzle=true; puzzleSel=null; openPuzzle(); say('✨ The pieces glow and fuse together into one parchment! It shows four symbols... the door code!'); }
+}
+function showSolved(){
+  document.querySelectorAll('.slot').forEach(s=>s.style.border='2px solid #e8c547');
+  $('pzOut').innerHTML='<p style="color:#e8c547"><b>✨ The map is whole again! Remember these four signs, Melih.</b></p>';
+}
+
+// ---------------- HINTS ----------------
+$('hintBtn').onclick=()=>{
+  const f=S.f; let h;
+  if(S.pieces<1 && !f.rug) h='Floors can hide things too. Have you looked under everything?';
+  else if(!f.key) h='Fires leave more than ashes... look closely at the fireplace.';
+  else if(!f.cabinet) h='That silver key must open something. Select it in your inventory, then click where it might fit.';
+  else if(!['red','yellow','blue','green'].every(c=>f['took_'+c])) h='Take everything useful from the potion cupboard.';
+  else if(!f.note) h='The cauldron wants four essences in the right order. A book on the shelf might explain it — something about potions...';
+  else if(!f.cauldron) h='Brave = Gryffindor, Loyal = Hufflepuff, Wise = Ravenclaw, Cunning = Slytherin. What are their colours? Select a bottle and click the cauldron.';
+  else if(!f.hist) h='One of the books on the shelf still hides something. Try the one Hermione always quotes.';
+  else if(!f.drawer) h='Read the blackboard. Harry\'s vault number at Gringotts is in the first book... (It\'s 687!)';
+  else if(!f.drawerPiece||!f.parchTaken) h='Take everything out of the drawer.';
+  else if(!has('secret')&&!f.portrait) h='Blank parchment that feels waxy... maybe a small flame helps. Select the candle, then click the parchment in your inventory.';
+  else if(!f.portrait) h='Read the revealed parchment (click it twice) and tell the portrait the password.';
+  else if(!f.portPiece) h='Look inside the opened portrait.';
+  else if(!f.puzzle) h='Click "Map pieces" in your inventory. Rotate each piece until the writing is upright and the circles line up.';
+  else h='Set the door dials to the four symbols from the map, from left to right.';
+  say('🦉 <b>Hint:</b> '+h);
+};
+
+// ---------------- TIMER & WIN ----------------
+const fmt=ms=>{ const s=Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); };
+setInterval(()=>{ if(!S.done) $('timer').textContent=fmt(Date.now()-S.start); },1000);
+function win(){
+  S.done=true; const t=fmt(Date.now()-S.start);
+  modal('🎉 You escaped, Melih!', `<div class="center"><div style="font-size:4rem">🚪✨🧙‍♂️</div>
+    <p>The four symbols blaze with golden light and the heavy door swings open. You sprint up the dungeon stairs just as you hear Snape's footsteps behind you...</p>
+    <p style="font-size:1.4rem;color:#e8c547"><b>Escape time: ${t}</b></p>
+    <p><i>"Fifty points to Gryffindor!" — Dumbledore, probably.</i></p>
+    <button class="btn" onclick="location.reload()">Play again</button></div>`);
+  say('🎉 Freedom! You escaped from Snape\'s dungeon!');
+}
+renderInv();
+</script>
+</body>
+</html>
