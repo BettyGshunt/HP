@@ -1,3 +1,3 @@
-# TFT Quiz for Melih
+# TFT Set 18 Quiz for Melih
 
-A small 12-question Teamfight Tactics quiz in English. Play it at https://bettygshunt.github.io/hp/
+A 13-question Teamfight Tactics quiz about Set 18: Enchanted Wilds. Play it at https://bettygshunt.github.io/hp/

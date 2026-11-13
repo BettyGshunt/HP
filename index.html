@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TFT Quiz for Melih</title>
+<title>TFT Set 18 Quiz for Melih</title>
 <style>
   body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-         background: radial-gradient(circle at top, #10334d, #050d18); color:#eef4f8;
+         background: radial-gradient(circle at top, #1f4d2e, #06140b); color:#eef4f8;
          font-family: Georgia, "Times New Roman", serif; }
-  .card { width:min(92vw, 560px); background:#0c1d2e; border:2px solid #c9a227; border-radius:16px;
+  .card { width:min(92vw, 560px); background:#0f2416; border:2px solid #c9a227; border-radius:16px;
           padding:28px; box-shadow:0 0 40px rgba(201,162,39,.25); }
   h1 { margin:0 0 6px; color:#e8c547; font-size:1.7rem; text-align:center; }
   .sub { text-align:center; opacity:.8; margin-bottom:22px; }
   .progress { font-size:.9rem; opacity:.75; margin-bottom:8px; }
   .q { font-size:1.2rem; margin-bottom:18px; }
   button.opt { display:block; width:100%; text-align:left; margin:8px 0; padding:12px 14px;
-               font:inherit; color:#eef4f8; background:#14304a; border:1px solid #2f6a92;
+               font:inherit; color:#eef4f8; background:#1a3a24; border:1px solid #3f8a55;
                border-radius:10px; cursor:pointer; transition:.15s; }
-  button.opt:hover:not(:disabled) { background:#1d4466; }
+  button.opt:hover:not(:disabled) { background:#255233; }
   button.opt.right { background:#1f5b3a; border-color:#3fbf7a; }
   button.opt.wrong { background:#6b1f2a; border-color:#d9475b; }
   .fb { min-height:1.4em; margin:12px 0; font-style:italic; }
-  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#0c1d2e;
+  .next, .restart { margin-top:8px; padding:10px 20px; font:inherit; background:#c9a227; color:#0f2416;
                     border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
   .center { text-align:center; }
   .big { font-size:3rem; margin:10px 0; }
@@ -31,30 +31,32 @@
 <div class="card" id="app"></div>
 <script>
 const questions = [
-  { q: "Which company makes Teamfight Tactics?", a: ["Blizzard", "Riot Games", "Valve", "Supercell"], c: 1,
-    f: "Riot Games – the same studio that makes League of Legends." },
-  { q: "How many players are in a normal TFT lobby?", a: ["4", "6", "8", "10"], c: 2,
-    f: "8 players – only one can finish 1st!" },
-  { q: "How much gold does a shop reroll cost?", a: ["1 gold", "2 gold", "3 gold", "4 gold"], c: 1,
-    f: "2 gold per reroll." },
-  { q: "How much gold do you pay to buy 4 XP?", a: ["2 gold", "4 gold", "5 gold", "10 gold"], c: 1,
-    f: "4 gold for 4 XP." },
-  { q: "What is the maximum interest you can earn per round?", a: ["3 gold", "5 gold", "10 gold", "There is no limit"], c: 1,
-    f: "5 gold – you get 1 gold for every 10 gold you hold, up to 50 gold." },
-  { q: "How many 1-star copies of a champion do you need to make a 3-star?", a: ["3", "6", "9", "12"], c: 2,
-    f: "9 copies: 3 one-stars make a two-star, and 3 two-stars make a three-star." },
-  { q: "What is the most items one champion can hold?", a: ["2", "3", "4", "6"], c: 1,
-    f: "3 items per champion." },
-  { q: "What do you get when you combine two B.F. Swords?", a: ["Infinity Edge", "Bloodthirster", "Deathblade", "Giant Slayer"], c: 2,
-    f: "Deathblade – pure attack damage." },
-  { q: "What do you get when you combine two Tears of the Goddess?", a: ["Blue Buff", "Spear of Shojin", "Archangel's Staff", "Rabadon's Deathcap"], c: 0,
-    f: "Blue Buff – great for champions who cast a lot." },
-  { q: "What is the little creature that walks around your board called?", a: ["A Poro", "A Little Legend", "A Minion", "A Tactician Pet"], c: 1,
-    f: "A Little Legend – like Pengu, River Sprite or Featherknight." },
-  { q: "What is the round called where everyone picks a champion with an item from a spinning circle?", a: ["The Shop", "The Arena", "The Carousel", "The Augment round"], c: 2,
-    f: "The Carousel (also called the shared draft) – lowest health picks first!" },
-  { q: "In which set were Augments first added to TFT?", a: ["Set 1: Faction Wars", "Set 3: Galaxies", "Set 6: Gizmos & Gadgets", "Set 9: Runeterra Reforged"], c: 2,
-    f: "Set 6: Gizmos & Gadgets in 2021 – and they've been in the game ever since." }
+  { q: "What is the name of TFT Set 18?", a: ["Space Gods", "Lore & Legends", "Enchanted Wilds", "Magic n' Mayhem"], c: 2,
+    f: "Enchanted Wilds – a magical forest full of beasts and spirits." },
+  { q: "What is the set mechanic of Enchanted Wilds called?", a: ["Charms", "Wisps", "Portals", "Encounters"], c: 1,
+    f: "Wisps – little magic sprites that show up in your shop." },
+  { q: "Wisps are a comeback of which mechanic from Set 12 (Magic n' Mayhem)?", a: ["Charms", "Augments", "Anomalies", "Hextech Gates"], c: 0,
+    f: "Charms! Riot brought them back and renamed them Wisps." },
+  { q: "How many Wisps can you buy per round?", a: ["1", "2", "3", "As many as you can afford"], c: 0,
+    f: "Only 1 per round – so choose wisely!" },
+  { q: "In which shop slot does a Wisp appear?", a: ["The leftmost slot", "The middle slot", "The rightmost slot", "A random slot"], c: 2,
+    f: "The rightmost slot, in every other shop – it covers up the champion behind it." },
+  { q: "Which trait makes your Wisps stronger?", a: ["Blossom", "Coven", "Fae", "Inferno"], c: 0,
+    f: "Blossom – after combat, your Wisps get empowered." },
+  { q: "With which trait can you get the Elder Dragon?", a: ["Primal", "Riftbeast", "Monolith", "Old Growth"], c: 1,
+    f: "Riftbeast – and the Elder Dragon (Apex Predator) takes up 2 team slots!" },
+  { q: "Which 5-cost champion comes in three different versions?", a: ["Ashe", "Gnar", "Kennen", "Lux"], c: 3,
+    f: "Lux – as Blackthorn, Blossom or Coven. She's an Avatar and counts twice for her trait." },
+  { q: "Which 5-cost champion has his very own trait called Greenfather?", a: ["Ivern", "Draven", "Gnar", "Alune"], c: 0,
+    f: "Ivern – his seeds grow special hexes that boost whoever stands on them." },
+  { q: "Which champion is the Bounty Seeker who completes bounties for rewards?", a: ["Ashe", "Draven", "Kennen", "Kha'Zix"], c: 1,
+    f: "Draven – choose a bounty and he works on it to earn you loot." },
+  { q: "What does the Eclipse trait do?", a: ["Gives your team a big shield", "Kills the lowest-Health enemy every few seconds", "Doubles your gold", "Freezes all enemies"], c: 1,
+    f: "After 10 seconds of combat, Eclipse executes the lowest-Health enemy over and over!" },
+  { q: "Which trait gives you plants you can place on the board?", a: ["Greenfather", "Thornmaiden", "Elderwood", "Flora Fatalis"], c: 2,
+    f: "Elderwood – the plants get stronger at higher trait levels." },
+  { q: "Which classic mechanic came back in Set 18 after Set 17 changed it?", a: ["The Carousel", "The Armory", "Hyper Roll", "Double Up"], c: 0,
+    f: "The Carousel – pick a champion with an item, lowest health first!" }
 ];
 
 let i = 0, score = 0;
@@ -62,9 +64,9 @@ const app = document.getElementById("app");
 
 function start() {
   app.innerHTML = `
-    <h1>🐧 Teamfight Tactics Quiz 🐧</h1>
+    <h1>🌿 TFT Set 18: Enchanted Wilds Quiz 🌿</h1>
     <div class="sub">Made for Melih – are you a Challenger player?</div>
-    <div class="center"><div class="big">⚔️</div>
+    <div class="center"><div class="big">🧚</div>
     <p>${questions.length} questions. GL HF!</p>
     <button class="next" onclick="show()">Start</button></div>`;
 }
