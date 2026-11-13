@@ -7,12 +7,14 @@
 <style>
   * { box-sizing:border-box; }
   body { margin:0; background:#07060c; color:#efe6c8; font-family:Georgia,"Times New Roman",serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; }
-  .wrap { width:min(96vw,980px); padding:14px 0 30px; }
+  body.danger::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:5; box-shadow: inset 0 0 120px rgba(255,0,0,.55); animation: pulse 1s infinite alternate; }
+  @keyframes pulse { from{opacity:.35} to{opacity:1} }
+  .wrap { width:min(96vw,1000px); padding:14px 0 30px; }
   h1 { color:#e8c547; margin:.2em 0; }
   h2 { color:#e8c547; margin:0 0 10px; font-size:1.25rem; }
   .btn { background:#c9a227; color:#1b1433; border:none; border-radius:8px; padding:9px 18px; font:inherit; font-weight:bold; cursor:pointer; }
   .btn.ghost { background:transparent; color:#e8c547; border:1px solid #c9a227; }
-  .btn:disabled { opacity:.4; cursor:default; }
+  .btn.big { font-size:1.4rem; padding:14px 34px; }
   .card { background:#15111f; border:1px solid #4a3d1e; border-radius:12px; padding:16px; margin:12px 0; }
   .small { font-size:.85rem; opacity:.8; }
   .center { text-align:center; }
@@ -23,31 +25,34 @@
   .role .big { font-size:3rem; }
   header.top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
   .pill { background:#221a35; border:1px solid #4b3d6e; border-radius:20px; padding:4px 12px; font-size:.9rem; }
+  #clock { font-size:1.6rem; font-weight:bold; font-variant-numeric:tabular-nums; color:#e8c547; padding:2px 14px; }
+  #clock.low { color:#ff5a5a; animation: pulse .5s infinite alternate; }
+  .pen { position:fixed; top:70px; left:50%; transform:translateX(-50%); color:#ff5a5a; font-size:2rem; font-weight:bold; z-index:30; animation: fly 1.2s forwards; pointer-events:none; }
+  @keyframes fly { from{opacity:1; transform:translate(-50%,0)} to{opacity:0; transform:translate(-50%,-50px)} }
   .room { border-radius:14px; padding:16px; border:2px solid #4a3d1e; }
   .room.dungeon { background:linear-gradient(#1d2a24,#101814); }
   .room.library { background:linear-gradient(#2a1d10,#160f08); }
-  .objs { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:12px; }
-  .obj { background:rgba(0,0,0,.35); border:1px solid #5b4b2a; border-radius:12px; padding:14px; cursor:pointer; text-align:center; position:relative; transition:.15s; }
+  .objs { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:12px; margin-top:12px; }
+  .obj { background:rgba(0,0,0,.35); border:1px solid #5b4b2a; border-radius:12px; padding:22px 12px 14px; cursor:pointer; text-align:center; position:relative; transition:.15s; }
   .obj:hover { border-color:#e8c547; transform:translateY(-2px); }
   .obj .ic { font-size:2.6rem; }
   .obj .t { font-weight:bold; color:#e8c547; margin-top:4px; }
   .obj .d { font-size:.8rem; opacity:.8; margin-top:4px; }
   .obj.done::after { content:"✔"; position:absolute; top:8px; right:10px; background:#2e9e55; color:#fff; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-family:sans-serif; font-size:14px; }
-  .obj.info::before { content:"📖 info for your partner"; position:absolute; top:6px; left:8px; font-size:.62rem; opacity:.75; }
-  .obj.lock::before { content:"🔒 lock"; position:absolute; top:6px; left:8px; font-size:.62rem; opacity:.75; }
+  .obj .ty { position:absolute; top:6px; left:8px; font-size:.65rem; opacity:.8; }
   #msg { margin-top:12px; padding:10px 14px; background:#15111f; border:1px solid #4a3d1e; border-radius:10px; font-style:italic; min-height:48px; }
 
-  #overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); display:none; align-items:center; justify-content:center; z-index:10; }
-  #modal { background:#1b1433; border:2px solid #c9a227; border-radius:14px; padding:20px; width:min(96vw,640px); max-height:95vh; overflow:auto; position:relative; }
+  #overlay { position:fixed; inset:0; background:rgba(0,0,0,.82); display:none; align-items:center; justify-content:center; z-index:10; }
+  #modal { background:#1b1433; border:2px solid #c9a227; border-radius:14px; padding:20px; width:min(96vw,660px); max-height:95vh; overflow:auto; position:relative; }
   #closeM { position:absolute; top:8px; right:12px; background:none; border:none; color:#e8c547; font-size:1.4rem; cursor:pointer; }
   .paper { background:#efe2b8; color:#3b2a14; padding:12px 16px; border-radius:6px; margin:10px 0; line-height:1.55; }
   .paper table { border-collapse:collapse; width:100%; }
-  .paper td, .paper th { border-bottom:1px solid #b99b5e; padding:6px; text-align:left; }
+  .paper td { border-bottom:1px solid #b99b5e; padding:6px; text-align:left; }
+  .paper ol { margin:6px 0; padding-left:22px; } .paper li { margin:4px 0; }
   .out { margin-top:10px; padding:9px 12px; background:#120e1d; border:1px solid #4a3d1e; border-radius:8px; font-style:italic; min-height:40px; }
   .row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:10px 0; }
   .bottle { width:76px; height:96px; border-radius:10px; border:2px solid #5b4b8a; background:#221a35; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:2.2rem; }
   .bottle small { font-size:.7rem; }
-  .bottle:active { transform:scale(.95); }
   .dots { text-align:center; font-size:1.4rem; letter-spacing:6px; min-height:1.6em; }
   .dials { display:flex; gap:12px; justify-content:center; margin:14px 0; }
   .dial { display:flex; flex-direction:column; align-items:center; gap:4px; }
@@ -57,16 +62,33 @@
   .runebig div { width:70px; height:80px; border:2px solid #9fd0ff; border-radius:10px; background:#1d2b44; color:#9fd0ff; font-size:3rem; display:flex; align-items:center; justify-content:center; }
   .bricks { display:grid; grid-template-columns:repeat(4,72px); gap:6px; justify-content:center; margin:12px auto; }
   .brick { width:72px; height:56px; background:#6b3a26; border:2px solid #3a1d10; border-radius:4px; font-size:1.8rem; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-  .brick:active, .brick.tap { background:#a0583a; }
+  .brick:active { background:#a0583a; }
   .books { display:flex; gap:8px; justify-content:center; align-items:flex-end; height:170px; padding:10px; background:#2a190c; border-bottom:10px solid #1a0f06; border-radius:4px; }
   .book { width:46px; border-radius:3px; cursor:pointer; writing-mode:vertical-rl; transform:rotate(180deg); color:#f6efd8; font-size:.75rem; padding:6px 0; text-align:center; border:1px solid rgba(0,0,0,.5); }
   .book.pulled { transform:rotate(180deg) translateY(16px); filter:brightness(1.3); }
   .founders { display:flex; gap:10px; justify-content:center; font-size:2.6rem; }
   .founders div { background:#2c3b2a; border:5px solid #a8862a; border-radius:8px; width:76px; height:90px; display:flex; align-items:center; justify-content:center; }
   .codebox { font-size:2.2rem; letter-spacing:10px; text-align:center; color:#3b2a14; font-weight:bold; }
-  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  /* howler */
+  .howler { background:#b3261e; border-radius:10px; padding:16px; position:relative; color:#fff; text-align:center; animation: rattle .15s infinite; }
+  @keyframes rattle { 0%{transform:rotate(-.6deg)} 50%{transform:rotate(.6deg)} 100%{transform:rotate(-.6deg)} }
+  .howler .seal { font-size:2.4rem; background:#5a0f0a; border-radius:50%; width:64px; height:64px; display:inline-flex; align-items:center; justify-content:center; border:3px solid #e8c547; }
+  .fuse { font-size:1.8rem; font-weight:bold; margin:6px 0; }
+  .ribbons { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+  .ribbon { height:26px; border-radius:13px; cursor:pointer; border:2px solid rgba(0,0,0,.4); display:flex; align-items:center; padding-left:12px; font-size:.8rem; color:#000; font-weight:bold; }
+  .ribbon:hover { filter:brightness(1.2); outline:2px dashed #fff; }
+  /* maze */
+  .maze { display:grid; gap:0; margin:12px auto; width:max-content; background:#0f0b1c; border:3px solid #c9a227; }
+  .cell { width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-size:1.6rem; box-sizing:border-box; }
+  .cell.n { border-top:4px solid #e8c547; } .cell.s { border-bottom:4px solid #e8c547; } .cell.e { border-right:4px solid #e8c547; } .cell.w { border-left:4px solid #e8c547; }
+  .bmaze .cell { border:1px dashed #3a3352; }
+  .arrows { display:grid; grid-template-columns:repeat(3,60px); gap:6px; justify-content:center; margin-top:8px; }
+  .arrows button { height:50px; font-size:1.4rem; background:#2a2050; color:#e8c547; border:1px solid #5b4b8a; border-radius:8px; cursor:pointer; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-7px)} 75%{transform:translateX(7px)} }
   .shake { animation:shake .3s 2; }
-  @media (max-width:560px){ .roles{grid-template-columns:1fr} .bricks{grid-template-columns:repeat(4,60px)} .brick{width:60px;height:48px} }
+  @keyframes quake { 0%,100%{transform:translate(0,0)} 25%{transform:translate(-4px,2px)} 50%{transform:translate(3px,-3px)} 75%{transform:translate(-2px,3px)} }
+  .quake { animation:quake .12s 8; }
+  @media (max-width:560px){ .roles{grid-template-columns:1fr} .bricks{grid-template-columns:repeat(4,60px)} .brick{width:60px;height:48px} .cell{width:44px;height:44px} }
 </style>
 </head>
 <body>
@@ -75,234 +97,314 @@
 
 <script>
 const $=id=>document.getElementById(id);
-// ---------- seeded random ----------
-function hash(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=h<<13|h>>>19; } return ()=>{ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); return (h^=h>>>16)>>>0; }; }
-function mulberry(a){ return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-let R; const ri=n=>Math.floor(R()*n); const shuf=a=>{ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=ri(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const TOTAL=25*60, PENALTY=20;
+// ---------- sound ----------
+let AC=null, muted=false;
+function tone(f,d=.15,type='sine',vol=.15,slide=0){ if(muted) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); const o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.value=f; if(slide) o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),AC.currentTime+d); g.gain.setValueAtTime(vol,AC.currentTime); g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d); o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime+d); }catch(e){} }
+const sfx={ good:()=>{ tone(660,.12); setTimeout(()=>tone(880,.12),110); setTimeout(()=>tone(1320,.25),220); }, bad:()=>tone(160,.35,'sawtooth',.12,-80), click:()=>tone(520,.05,'square',.05),
+  boom:()=>{ tone(90,.8,'sawtooth',.25,-60); tone(60,1,'square',.15,-30); }, tick:()=>tone(1000,.03,'square',.04), step:()=>{ tone(110,.12,'triangle',.25); setTimeout(()=>tone(100,.12,'triangle',.25),380); }, scream:()=>tone(900,.25,'sawtooth',.06,600) };
 
-// ---------- build the shared game from the code ----------
+// ---------- seeded random ----------
+function hash(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=h<<13|h>>>19; } h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); return (h^=h>>>16)>>>0; }
+function mulberry(a){ return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+let R=Math.random; const ri=n=>Math.floor(R()*n); const shuf=a=>{ a=[...a]; for(let i=a.length-1;i>0;i--){ const j=ri(i+1); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+// ---------- shared game from code ----------
 let G=null;
 const COLORS={ red:['#d33','Red'], yellow:['#e8c547','Yellow'], blue:['#3b6fd8','Blue'], green:['#2e9e55','Green'], purple:['#9b4fd8','Purple'] };
 const CSYM=[['☾','Moon'],['☀','Sun'],['★','Star'],['⚡','Lightning bolt']];
 const RUNES=['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ'];
 const ICONS=['🐸','🦉','🐍','🦁','🦡','🦅','🐀','🕷️','🦄','🐉','🧹','🔮','🗝️','⭐','🌙','🍄'];
 const HOUSE={ '🦁':['Gryffindor','#9b1c1c'], '🦡':['Hufflepuff','#c9a227'], '🦅':['Ravenclaw','#1f3f8a'], '🐍':['Slytherin','#1f6b3a'] };
+const N=5; // maze size
 function build(code){
-  R=mulberry(hash(code)());
-  const g={};
-  // T1 cauldron (A locks, B knows)
-  g.t1sym = ri(4);
-  g.t1table = CSYM.map(()=>shuf(Object.keys(COLORS)).slice(0,4));
-  // T2 rune gate (B locks, A knows)
-  g.t2map = shuf([0,1,2,3,4,5,6,7,8,9]);           // rune i -> digit
-  g.t2runes = shuf([...Array(10).keys()]).slice(0,4); // runes on the gate
-  // T3 brick wall (A locks, B knows)
-  g.t3icons = shuf(ICONS);                          // brick idx -> icon
-  const targets = shuf([...Array(16).keys()]).slice(0,3);
-  g.t3targets = targets;
-  g.t3text = targets.map(t=>{
-    const r=Math.floor(t/4), c=t%4, opts=[];
-    if(r>0) opts.push(['below', t-4]); if(r<3) opts.push(['above', t+4]);
-    if(c>0) opts.push(['to the right of', t-1]); if(c<3) opts.push(['to the left of', t+1]);
-    if(R()<0.3) return `the brick with the <b>${g.t3icons[t]}</b>`;
-    const [w,n]=opts[ri(opts.length)];
-    return `the brick directly <b>${w}</b> the <b>${g.t3icons[n]}</b> brick`;
-  });
-  // T4 founders / books (B locks, A knows)
-  g.t4order = shuf(['🦁','🦡','🦅','🐍']);
-  g.t4shelf = shuf(['🦁','🦡','🦅','🐍','x1','x2']);
-  // exit codes
-  g.codeA = Array.from({length:4},()=>ri(10)); // A's door, shown to B
-  g.codeB = Array.from({length:4},()=>ri(10)); // B's door, shown to A
-  return g;
+  R=mulberry(hash(code)); const g={};
+  g.t1sym=ri(4); g.t1table=CSYM.map(()=>shuf(Object.keys(COLORS)).slice(0,4)); g.t1smoke=R()<.5?'purple':'white';
+  g.t2map=shuf([0,1,2,3,4,5,6,7,8,9]); g.t2runes=shuf([...Array(10).keys()]).slice(0,4);
+  g.t3icons=shuf(ICONS); const targets=shuf([...Array(16).keys()]).slice(0,4); g.t3targets=targets;
+  g.t3text=targets.map(t=>{ const r=Math.floor(t/4), c=t%4, opts=[];
+    if(r>0) opts.push(['below',t-4]); if(r<3) opts.push(['above',t+4]); if(c>0) opts.push(['to the right of',t-1]); if(c<3) opts.push(['to the left of',t+1]);
+    if(R()<0.25) return `the brick with the <b>${g.t3icons[t]}</b>`; const [w,n]=opts[ri(opts.length)]; return `the brick directly <b>${w}</b> the <b>${g.t3icons[n]}</b> brick`; });
+  g.t4order=shuf(['🦁','🦡','🦅','🐍']); g.t4shelf=shuf(['🦁','🦡','🦅','🐍','x1','x2']);
+  // maze (B walks, A has the map)
+  const walls=[...Array(N*N)].map(()=>({n:1,e:1,s:1,w:1})), seen=new Set(), stack=[ri(N*N)]; seen.add(stack[0]);
+  while(stack.length){ const c=stack[stack.length-1], r=Math.floor(c/N), k=c%N, nb=[];
+    if(r>0&&!seen.has(c-N)) nb.push(['n','s',c-N]); if(r<N-1&&!seen.has(c+N)) nb.push(['s','n',c+N]); if(k>0&&!seen.has(c-1)) nb.push(['w','e',c-1]); if(k<N-1&&!seen.has(c+1)) nb.push(['e','w',c+1]);
+    if(!nb.length){ stack.pop(); continue; } const [a,b,nx]=nb[ri(nb.length)]; walls[c][a]=0; walls[nx][b]=0; seen.add(nx); stack.push(nx); }
+  // remove a few extra walls so there are loops
+  for(let i=0;i<3;i++){ const c=ri(N*N-N); if(c%N<N-1){ walls[c].e=0; walls[c+1].w=0; } }
+  g.walls=walls; g.mStart=ri(N*N);
+  const dist=Array(N*N).fill(-1), q=[g.mStart]; dist[g.mStart]=0;
+  while(q.length){ const c=q.shift(); [['n',-N],['s',N],['e',1],['w',-1]].forEach(([d,o])=>{ if(!walls[c][d]&&dist[c+o]<0){ dist[c+o]=dist[c]+1; q.push(c+o); } }); }
+  g.mGoal=dist.indexOf(Math.max(...dist));
+  g.codeA=Array.from({length:4},()=>ri(10)); g.codeB=Array.from({length:4},()=>ri(10));
+  R=Math.random; return g;
 }
 
 // ---------- state ----------
-const S={ code:null, role:null, done:{}, start:null, escaped:false };
-function save(){ try{ localStorage.setItem('duo_'+S.code+'_'+S.role, JSON.stringify(S.done)); }catch(e){} }
-function load(){ try{ const d=localStorage.getItem('duo_'+S.code+'_'+S.role); if(d) S.done=JSON.parse(d); }catch(e){} }
+const S={ code:null, role:null, done:{}, left:TOTAL, running:false, escaped:false, over:false, warned:{} };
+function save(){ try{ localStorage.setItem('duo2_'+S.code+'_'+S.role, JSON.stringify({done:S.done,left:S.left})); }catch(e){} }
+function load(){ try{ const d=JSON.parse(localStorage.getItem('duo2_'+S.code+'_'+S.role)||'null'); if(d){ S.done=d.done||{}; S.left=d.left||TOTAL; } }catch(e){} }
 
-// ---------- modal ----------
+// ---------- UI helpers ----------
+let onClose=null;
 function modal(title,html){ $('mbody').innerHTML=`<h2>${title}</h2>${html}`; $('overlay').style.display='flex'; }
-function closeModal(){ $('overlay').style.display='none'; renderRoom(); }
+function closeModal(){ $('overlay').style.display='none'; if(onClose){ onClose(); onClose=null; } if(S.role&&!S.over) renderRoom(); }
 $('closeM').onclick=closeModal; $('overlay').onclick=e=>{ if(e.target.id==='overlay') closeModal(); };
 function out(t){ const o=$('out'); if(o) o.innerHTML=t; }
 function say(t){ const m=$('msg'); if(m) m.innerHTML=t; }
-function shake(){ const m=$('modal'); m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake'); }
+function shake(){ const m=$('modal'); if(!m) return; m.classList.remove('shake'); void m.offsetWidth; m.classList.add('shake'); }
+function quake(){ document.body.classList.remove('quake'); void document.body.offsetWidth; document.body.classList.add('quake'); }
+function penalty(sec=PENALTY,why=''){ S.left=Math.max(0,S.left-sec); sfx.bad(); shake(); const p=document.createElement('div'); p.className='pen'; p.textContent=`−0:${String(sec).padStart(2,'0')}`; document.body.appendChild(p); setTimeout(()=>p.remove(),1200); save(); updateClock(); }
 function dialHTML(vals,faces,p){ return `<div class="dials">${vals.map((v,i)=>`<div class="dial"><button data-d="${p}${i}" data-dir="1">▲</button><div class="face" id="${p}f${i}">${faces[v]}</div><button data-d="${p}${i}" data-dir="-1">▼</button></div>`).join('')}</div>`; }
-function wireDials(arr,faces,p){ document.querySelectorAll(`[data-d^="${p}"]`).forEach(b=>b.onclick=()=>{ const i=+b.dataset.d.slice(p.length); arr[i]=(arr[i]+ +b.dataset.dir+faces.length)%faces.length; $(p+'f'+i).textContent=faces[arr[i]]; }); }
+function wireDials(arr,faces,p){ document.querySelectorAll(`[data-d^="${p}"]`).forEach(b=>b.onclick=()=>{ sfx.click(); const i=+b.dataset.d.slice(p.length); arr[i]=(arr[i]+ +b.dataset.dir+faces.length)%faces.length; $(p+'f'+i).textContent=faces[arr[i]]; }); }
 const DIG=[...Array(10).keys()].map(String);
+const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
 
 // ================= LOBBY =================
 function lobby(){
+  document.body.classList.remove('danger');
   $('app').innerHTML=`
     <h1 class="center">⚡ Two Rooms, One Escape</h1>
-    <p class="center">A Hogwarts escape room for <b>two players on two devices</b>.</p>
+    <p class="center">A Hogwarts escape room for <b>two players on two devices</b>. 🔊 Sound on!</p>
     <div class="card">
-      <p>🧙 One of you is trapped in <b>Snape's dungeon</b>, the other in the <b>library's Restricted Section</b>. You can only talk to each other through an enchanted mirror (= talk out loud, call each other, or sit back to back).</p>
-      <p>⚠️ <b>The rules:</b> Never look at your partner's screen! Everything you need to escape is in the <i>other</i> room — so describe, explain and listen carefully.</p>
+      <p>🧙 One of you is trapped in <b>Snape's dungeon</b>, the other in the library's <b>Restricted Section</b>. You can only talk to each other through an enchanted mirror — talk out loud, call each other, or sit back to back.</p>
+      <p>⏳ <b>Snape returns in 25 minutes.</b> Every mistake costs you time. If he catches you, it's detention forever.</p>
+      <p>⚠️ <b>Never look at your partner's screen!</b> Everything you need is in the <i>other</i> room.</p>
     </div>
     <div class="card center">
       <h2>1. Get a game code</h2>
-      <p class="small">One player creates a code, the other one types in the same code.</p>
       <button class="btn" id="newCode">Create new code</button>
-      <p>or enter your partner's code:</p>
+      <p>or type in your partner's code:</p>
       <input class="code" id="codeIn" maxlength="4" placeholder="ABCD">
     </div>
     <div class="card">
       <h2 class="center">2. Choose your room (each player takes a different one!)</h2>
       <div class="roles">
-        <div class="role" data-r="A"><div class="big">🧪</div><b>Player 1: Snape's Dungeon</b><p class="small">Cauldrons, a magic brick wall and a heavy door.</p></div>
-        <div class="role" data-r="B"><div class="big">📚</div><b>Player 2: The Restricted Section</b><p class="small">Ancient books, a rune gate and a secret shelf.</p></div>
+        <div class="role" data-r="A"><div class="big">🧪</div><b>Player 1: Snape's Dungeon</b><p class="small">A bubbling cauldron, a magic brick wall and a screaming Howler.</p></div>
+        <div class="role" data-r="B"><div class="big">📚</div><b>Player 2: The Restricted Section</b><p class="small">A rune gate, a secret shelf and the moving staircases.</p></div>
       </div>
       <p class="center small" id="lobbyMsg"></p>
     </div>`;
-  $('newCode').onclick=()=>{ const L='ABCDEFGHJKLMNPQRSTUVWXYZ'; $('codeIn').value=Array.from({length:4},()=>L[Math.floor(Math.random()*L.length)]).join(''); $('lobbyMsg').textContent='Tell your partner this code: '+$('codeIn').value; };
+  $('newCode').onclick=()=>{ const L='ABCDEFGHJKLMNPQRSTUVWXYZ'; $('codeIn').value=Array.from({length:4},()=>L[Math.floor(Math.random()*L.length)]).join(''); $('lobbyMsg').innerHTML='Tell your partner this code: <b>'+$('codeIn').value+'</b>'; };
   document.querySelectorAll('.role').forEach(r=>r.onclick=()=>{
     const c=$('codeIn').value.trim().toUpperCase();
-    if(!/^[A-Z]{4}$/.test(c)){ $('lobbyMsg').textContent='Please create or enter a 4-letter code first.'; return; }
-    S.code=c; S.role=r.dataset.r; G=build(c); load(); S.start=Date.now(); renderRoom();
-    say(S.role==='A'?'You wake up on the cold floor of Snape\'s dungeon. The door is locked. A voice comes from the old mirror on the wall — it\'s your partner, trapped in the library! Talk to each other.':'You\'re locked inside the Restricted Section of the library. Shadows move between the shelves... An old mirror shows your partner, trapped in Snape\'s dungeon. Talk to each other!');
+    if(!/^[A-Z]{4}$/.test(c)){ $('lobbyMsg').textContent='Please create or type in a 4-letter code first.'; return; }
+    S.code=c; S.role=r.dataset.r; G=build(c); S.done={}; S.left=TOTAL; load(); readyScreen();
   });
 }
+function readyScreen(){
+  const resumed=Object.keys(S.done).length>0;
+  $('app').innerHTML=`<div class="card center" style="margin-top:40px">
+    <h1>${S.role==='A'?'🧪 Snape\'s Dungeon':'📚 The Restricted Section'}</h1><p>Game code: <b>${S.code}</b></p>
+    ${resumed?`<p>Welcome back! Your progress was saved. Time left: <b>${fmt(S.left)}</b></p>`:`<p>When you are <b>both</b> ready, count down together:</p><p style="font-size:2rem;color:#e8c547"><b>3 … 2 … 1 …</b></p><p>and press START at the same moment!</p>`}
+    <button class="btn big" id="go">${resumed?'CONTINUE':'START'}</button></div>`;
+  $('go').onclick=()=>{ sfx.good(); S.running=true; renderRoom();
+    say(S.role==='A'?'🕯️ You wake up on the cold floor of Snape\'s dungeon. The door is locked. The old mirror on the wall flickers — your partner\'s face appears! They\'re trapped in the library. <b>Snape will be back in 25 minutes...</b>':'🕯️ You\'re locked in the Restricted Section. Books whisper on the shelves. In an old mirror you can see your partner — trapped in Snape\'s dungeon! <b>Snape will be back in 25 minutes...</b>'); };
+}
 
-// ================= ROOMS =================
-function objHTML(id,ic,t,d,type){ return `<div class="obj ${type}${S.done[id]?' done':''}" data-o="${id}"><div class="ic">${ic}</div><div class="t">${t}</div><div class="d">${d}</div></div>`; }
+// ================= ROOM =================
+function objHTML(id,ic,t,d,ty){ const label={lock:'🔒 lock',info:'📖 for your partner',goal:'⭐'}[ty]; return `<div class="obj${S.done[id]?' done':''}" data-o="${id}"><span class="ty">${label}</span><div class="ic">${ic}</div><div class="t">${t}</div><div class="d">${d}</div></div>`; }
+function allMine(){ return S.role==='A' ? (S.done.t1&&S.done.t3&&S.done.t5) : (S.done.t2&&S.done.t4&&S.done.t6); }
 function renderRoom(){
-  if(!S.role) return;
-  const A=S.role==='A';
+  if(!S.role) return; const A=S.role==='A';
   const objs = A ? [
-      objHTML('t1','⚗️','The Cauldron','Five essence bottles and an engraved symbol.','lock'),
-      objHTML('t3','🧱','The Brick Wall','Sixteen bricks, each with a strange picture.','lock'),
-      objHTML('scroll','📜','Rune Scroll','A table of ancient runes and numbers.','info'),
-      objHTML('portrait','🖼️','Portrait of the Founders','Four founders, standing in a row.','info'),
-      objHTML('safe','🔐','Snape\'s Safe', (S.done.t1&&S.done.t3)?'It\'s open!':'Opens when the cauldron and the wall are solved.', (S.done.t1&&S.done.t3)?'info':'lock'),
-      objHTML('door','🚪','The Dungeon Door','A heavy door with a 4-number lock.','lock')
+      objHTML('t1','⚗️','The Cauldron','Five bottles, a symbol and strange smoke.','lock'),
+      objHTML('t3','🧱','The Brick Wall','Sixteen bricks with pictures.','lock'),
+      objHTML('t5','📨','The Howler','A red letter, shaking and smoking...','lock'),
+      objHTML('scroll','📜','Rune Scroll','Ancient runes and numbers.','info'),
+      objHTML('portrait','🖼️','Portrait of the Founders','Four founders in a row.','info'),
+      objHTML('map','🗺️','The Marauder\'s Map','"I solemnly swear that I am up to no good."','info'),
+      objHTML('safe','🔐','Snape\'s Safe', allMine()?'It\'s open!':'Three keyholes...','goal'),
+      objHTML('door','🚪','The Dungeon Door','A heavy door with a number lock.','goal')
     ] : [
-      objHTML('potionbook','📕','"Potions of Passage"','A book about cauldron symbols.','info'),
-      objHTML('t2','🌀','The Rune Gate','A gate with four glowing runes and a number lock.','lock'),
-      objHTML('brickbook','📗','"Secret Passages of Hogwarts"','Instructions for a magic brick wall.','info'),
-      objHTML('t4','📚','The Secret Shelf','Six books. Pull the right ones in the right order...','lock'),
-      objHTML('chest','🧰','Locked Chest', (S.done.t2&&S.done.t4)?'It\'s open!':'Opens when the gate and the shelf are solved.', (S.done.t2&&S.done.t4)?'info':'lock'),
-      objHTML('door','🚪','The Library Door','A door with a 4-number lock.','lock')
+      objHTML('t2','🌀','The Rune Gate','Four glowing runes and a lock.','lock'),
+      objHTML('t4','📚','The Secret Shelf','Six books without titles.','lock'),
+      objHTML('t6','🪜','The Moving Staircases','You must find your way through the dark.','lock'),
+      objHTML('potionbook','📕','"Potions of Passage"','A book about cauldrons.','info'),
+      objHTML('brickbook','📗','"Secret Passages"','About a magic brick wall.','info'),
+      objHTML('howlerbook','📙','"Howlers & How to Stop Them"','A very loud-looking book.','info'),
+      objHTML('chest','🧰','Locked Chest', allMine()?'It\'s open!':'Three keyholes...','goal'),
+      objHTML('door','🚪','The Library Door','A door with a number lock.','goal')
     ];
-  const keep = $('msg') ? $('msg').innerHTML : '';
+  const keep=$('msg')?$('msg').innerHTML:'';
   $('app').innerHTML=`
-    <header class="top"><h1>${A?'🧪 Snape\'s Dungeon':'📚 The Restricted Section'}</h1>
-      <div><span class="pill">Code: <b>${S.code}</b></span> <span class="pill">${A?'Player 1':'Player 2'}</span> <span class="pill" id="tm">00:00</span></div></header>
+    <header class="top"><h1>${A?'🧪 Snape\'s Dungeon':'📚 Restricted Section'}</h1>
+      <div><span class="pill">Code <b>${S.code}</b></span> <span class="pill">${A?'Player 1':'Player 2'}</span> <span class="pill" id="mute" style="cursor:pointer">${muted?'🔇':'🔊'}</span> <span id="clock">${fmt(S.left)}</span></div></header>
     <div class="room ${A?'dungeon':'library'}">
-      <p class="small">${A?'Your partner is in the library. 🔒 = a lock you must open, 📖 = information your partner needs.':'Your partner is in Snape\'s dungeon. 🔒 = a lock you must open, 📖 = information your partner needs.'}</p>
+      <p class="small">Your partner is in the ${A?'library':'dungeon'}. 🔒 = a lock you must open yourself. 📖 = information your partner needs — read it to them!</p>
       <div class="objs">${objs.join('')}</div>
     </div>
     <div id="msg">${keep}</div>
     <p class="center small"><button class="btn ghost" id="leave">Leave game</button></p>`;
-  document.querySelectorAll('.obj').forEach(o=>o.onclick=()=>OPEN[o.dataset.o]());
-  $('leave').onclick=()=>{ if(confirm('Leave this game? Your progress on this device will stay saved for this code.')){ S.role=null; lobby(); } };
+  document.querySelectorAll('.obj').forEach(o=>o.onclick=()=>{ sfx.click(); OPEN[o.dataset.o](); });
+  $('leave').onclick=()=>{ if(confirm('Leave this game? Your progress stays saved for this code.')){ S.running=false; S.role=null; lobby(); } };
+  $('mute').onclick=()=>{ muted=!muted; $('mute').textContent=muted?'🔇':'🔊'; };
+  updateClock();
 }
-setInterval(()=>{ const t=$('tm'); if(t&&S.start&&!S.escaped){ const s=Math.floor((Date.now()-S.start)/1000); t.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); } },1000);
-function solve(id,text){ S.done[id]=true; save(); out(text); say(text); }
+function updateClock(){ const c=$('clock'); if(c){ c.textContent=fmt(S.left); c.classList.toggle('low',S.left<=120); } document.body.classList.toggle('danger', S.running && S.left<=120); }
+const WARN={ 900:'👣 Somewhere far above, a door slams. Snape is on his way down... (15 minutes left)', 600:'👣 You hear footsteps on the stairs. Robes swishing. (10 minutes left)', 300:'🐈 Mrs Norris\' eyes glow at the end of the corridor. Filch can\'t be far — and Snape is close! (5 minutes left)', 120:'⚠️ "Who is down there?" — that\'s SNAPE\'S VOICE! (2 minutes left!)', 30:'😱 The door handle starts to turn... (30 seconds!)' };
+setInterval(()=>{
+  if(!S.running||S.escaped||S.over) return;
+  S.left--; if(S.left%10===0) save();
+  if(S.left<=60) sfx.tick();
+  Object.keys(WARN).forEach(k=>{ if(S.left<=+k && !S.warned[k]){ S.warned[k]=1; if(S.left>+k-5){ say(WARN[k]); sfx.step(); quake(); } } });
+  updateClock();
+  if(S.left<=0) gameOver();
+},1000);
+function solve(id,text){ S.done[id]=true; save(); sfx.good(); out(text); say(text + (allMine()?' <b>🔓 All your locks are open — check the '+(S.role==='A'?'safe':'chest')+'!</b>':'')); }
 
+// ================= PUZZLES =================
 const OPEN={
-  // ---------- PLAYER 1 (dungeon) ----------
+  // ---------- PLAYER 1 ----------
   t1(){
     if(S.done.t1) return modal('⚗️ The Cauldron','<p>The potion glows gold. Solved!</p>');
-    let seq=[];
-    const sym=CSYM[G.t1sym];
+    let seq=[]; const sym=CSYM[G.t1sym];
     const draw=()=>{
-      modal('⚗️ The Cauldron', `<p>A cauldron bubbles in front of you. Engraved on its rim is a single symbol:</p>
-        <div class="center" style="font-size:4rem;color:#e8c547">${sym[0]}</div>
-        <p>Five essence bottles stand next to it. Only <b>four</b> of them belong in the potion — in the right order. You have no idea which... but maybe someone in the library does?</p>
+      modal('⚗️ The Cauldron', `<p>Engraved on the cauldron's rim is a symbol:</p><div class="center" style="font-size:4rem;color:#e8c547">${sym[0]}</div>
+        <p>Thick <b style="color:${G.t1smoke==='purple'?'#c58cff':'#fff'}">${G.t1smoke} smoke</b> rises from it. Five bottles stand next to it — only <b>four</b> belong in the potion, in the right order.</p>
         <div class="row">${Object.keys(COLORS).map(c=>`<div class="bottle" data-c="${c}"><span style="filter:drop-shadow(0 0 8px ${COLORS[c][0]})">🧪</span><small>${COLORS[c][1]}</small></div>`).join('')}</div>
         <div class="dots">${seq.map(c=>`<span style="color:${COLORS[c][0]}">●</span>`).join('')||'<span class="small">(nothing poured yet)</span>'}</div><div class="out" id="out"></div>`);
-      document.querySelectorAll('.bottle').forEach(b=>b.onclick=()=>{ seq.push(b.dataset.c);
-        const sol=G.t1table[G.t1sym];
-        if(seq.length===4){ if(seq.join()===sol.join()){ solve('t1','✨ The potion turns gold and the cauldron rings like a bell! Somewhere, a lock clicks open.'); return; }
-          seq=[]; draw(); shake(); out('💥 POOF! Purple smoke everywhere. Wrong recipe — the cauldron empties itself. Ask your partner again!'); return; }
+      document.querySelectorAll('.bottle').forEach(b=>b.onclick=()=>{ sfx.click(); seq.push(b.dataset.c);
+        let sol=[...G.t1table[G.t1sym]]; if(G.t1smoke==='purple') [sol[0],sol[3]]=[sol[3],sol[0]];
+        if(seq.length===4){ if(seq.join()===sol.join()) return solve('t1','✨ The potion turns gold and the cauldron rings like a bell!');
+          seq=[]; draw(); penalty(); out('💥 POOF! Purple smoke everywhere — your eyebrows are singed. Wrong recipe! (−20 seconds)'); return; }
         draw(); });
     }; draw();
   },
   t3(){
-    if(S.done.t3) return modal('🧱 The Brick Wall','<p>The bricks have rearranged themselves into an archway. Solved!</p>');
-    let seq=[];
+    if(S.done.t3) return modal('🧱 The Brick Wall','<p>The bricks have folded into an archway. Solved!</p>');
+    let n=0;
     const draw=()=>{
-      modal('🧱 The Brick Wall', `<p>Just like the entrance to Diagon Alley, this wall opens if you tap <b>three bricks in the right order</b>. Each brick has a picture. Your partner might have instructions...</p>
+      modal('🧱 The Brick Wall', `<p>Like the entrance to Diagon Alley — tap <b>four bricks in the right order</b>. Your partner might have the instructions...</p>
         <div class="bricks">${G.t3icons.map((ic,i)=>`<div class="brick" data-b="${i}">${ic}</div>`).join('')}</div>
-        <div class="dots">${'🪄'.repeat(seq.length)||'<span class="small">(no bricks tapped yet)</span>'}</div><div class="out" id="out"></div>`);
-      document.querySelectorAll('.brick').forEach(b=>b.onclick=()=>{ const i=+b.dataset.b; seq.push(i);
-        if(seq[seq.length-1]!==G.t3targets[seq.length-1]){ seq=[]; draw(); shake(); out('The bricks shudder and go still. Wrong brick — start again from the first one!'); return; }
-        if(seq.length===3){ solve('t3','✨ The bricks wriggle and fold back into an archway! Somewhere, a lock clicks open.'); return; }
-        draw(); out('The brick glows for a moment... keep going!'); });
+        <div class="dots">${'🪄'.repeat(n)||'<span class="small">(no bricks tapped yet)</span>'}</div><div class="out" id="out"></div>`);
+      document.querySelectorAll('.brick').forEach(b=>b.onclick=()=>{ const i=+b.dataset.b;
+        if(i!==G.t3targets[n]){ n=0; draw(); penalty(); out('The wall rumbles angrily and spits brick dust at you. Wrong brick — start again! (−20 seconds)'); return; }
+        n++; sfx.click(); if(n===4) return solve('t3','✨ The bricks wriggle and fold back into an archway!'); draw(); out('The brick glows... keep going!'); });
     }; draw();
   },
-  scroll(){
-    modal('📜 The Rune Scroll', `<p>An old scroll pinned to the wall. It means nothing to you — but it might mean something to your partner.</p>
-      <div class="paper"><b>Ancient Runes → Numbers</b><table>${RUNES.map((r,i)=>`<tr><td style="font-size:1.8rem;width:60px">${r}</td><td style="font-size:1.3rem">${G.t2map[i]}</td></tr>`).join('')}</table></div>
-      <p class="small">Tip: runes are hard to describe. Try things like "a line with two arrows" or "looks like a P".</p>`);
+  t5(){
+    if(S.done.t5) return modal('📨 The Howler','<p>The Howler has crumbled into harmless ashes. Phew!</p>');
+    // local random each attempt — partner only has the rules
+    const RC={ red:'#d33', blue:'#3b6fd8', yellow:'#e8c547', white:'#f2f2f2', black:'#222' };
+    const cnt=4+Math.floor(Math.random()*3); const rib=Array.from({length:cnt},()=>Object.keys(RC)[Math.floor(Math.random()*5)]);
+    const seal=['🦁','🐍','🦅','🦡'][Math.floor(Math.random()*4)];
+    const answer=howlerAnswer(rib,seal);
+    let fuse=60; let timer=null;
+    modal('📨 The Howler', `<div class="howler"><div class="seal">${seal}</div><div class="fuse" id="fuse">⏱ 60</div>
+      <div>The Howler is smoking and shaking! It's tied with ${cnt} ribbons. Cut the <b>right one</b> before it explodes!</div>
+      <div class="ribbons">${rib.map((c,i)=>`<div class="ribbon" data-i="${i}" style="background:${RC[c]};color:${c==='black'||c==='blue'||c==='red'?'#fff':'#000'}">${i+1}. ${c}</div>`).join('')}</div></div>
+      <p class="small">Describe the seal and the ribbons (from top to bottom) to your partner. Close this window to give up — it will reset.</p><div class="out" id="out"></div>`);
+    timer=setInterval(()=>{ fuse--; const f=$('fuse'); if(f) f.textContent='⏱ '+fuse; if(fuse<=10) sfx.scream(); if(fuse<=0){ clearInterval(timer); boom(); } },1000);
+    onClose=()=>clearInterval(timer);
+    const boom=()=>{ sfx.boom(); quake(); penalty(40); onClose=null; modal('💥 BOOM!', '<p style="font-size:1.2rem">The Howler explodes and SCREAMS so loudly that the whole castle can hear it! <b>(−40 seconds)</b></p><p>A new Howler flies in through the chimney. Open it again and try once more!</p>'); };
+    document.querySelectorAll('.ribbon').forEach(el=>el.onclick=()=>{ clearInterval(timer); onClose=null;
+      if(+el.dataset.i===answer){ modal('📨 The Howler','<p>✂️ <b>Snip!</b> The Howler gives a tiny squeak... and crumbles into ashes.</p><div class="out" id="out"></div>'); solve('t5','✨ You defused the Howler!'); }
+      else boom(); });
   },
-  portrait(){
-    modal('🖼️ Portrait of the Founders', `<p>A big painting of the four Hogwarts founders, standing in a row from left to right. Each one holds their house animal. Underneath, a small plaque.</p>
-      <div class="founders">${G.t4order.map(a=>`<div>${a}</div>`).join('')}</div>
-      <div class="paper">The plaque says: <i>"As we stand, so shall our books be taken — from left to right."</i></div>`);
+  scroll(){ modal('📜 The Rune Scroll', `<p>An old scroll on the wall. It means nothing to you — but it might help your partner.</p>
+      <div class="paper"><b>Ancient Runes → Numbers</b><table>${RUNES.map((r,i)=>`<tr><td style="font-size:1.8rem;width:60px">${r}</td><td style="font-size:1.3rem">${G.t2map[i]}</td></tr>`).join('')}</table></div>
+      <p class="small">Runes are hard to describe! Try things like "a line with two arrows" or "looks like a P".</p>`); },
+  portrait(){ modal('🖼️ Portrait of the Founders', `<p>The four Hogwarts founders, standing in a row from left to right, each holding their house animal.</p>
+      <div class="founders">${G.t4order.map(a=>`<div>${a}</div>`).join('')}</div><div class="paper">The plaque says: <i>"As we stand, so shall our books be taken — from left to right."</i></div>`); },
+  map(){
+    const cells=G.walls.map((w,i)=>`<div class="cell ${w.n?'n':''} ${w.e?'e':''} ${w.s?'s':''} ${w.w?'w':''}">${i===G.mStart?'👣':i===G.mGoal?'🚪':''}</div>`).join('');
+    modal('🗺️ The Marauder\'s Map', `<p>The map shows the <b>moving staircases</b> near the library. Your partner must walk through them <b>in the dark</b> — they can't see the walls! 👣 = where they start, 🚪 = the way out. Golden lines are walls.</p>
+      <div class="maze" style="grid-template-columns:repeat(${N},auto)">${cells}</div>
+      <p class="small">Guide them step by step: "go up", "go right"... If they walk into a wall, Peeves throws them back to the start!</p>`);
   },
   safe(){
-    if(!(S.done.t1&&S.done.t3)) return modal('🔐 Snape\'s Safe', `<p>A small iron safe with two empty keyholes shaped like a cauldron and a brick. It won't open yet.</p><p class="small">Solved: cauldron ${S.done.t1?'✔':'✘'} · brick wall ${S.done.t3?'✔':'✘'}</p>`);
-    modal('🔐 Snape\'s Safe', `<p>The safe swings open! Inside is a note in Snape's handwriting:</p><div class="paper"><i>"The library door opens with:"</i><div class="codebox">${G.codeB.join('')}</div></div><p class="small">This is the code for <b>your partner's</b> door. Tell it to them!</p>`);
+    if(!allMine()) return modal('🔐 Snape\'s Safe', `<p>An iron safe with three keyholes — shaped like a cauldron, a brick and an envelope.</p><p>Cauldron ${S.done.t1?'✔':'✘'} · Brick wall ${S.done.t3?'✔':'✘'} · Howler ${S.done.t5?'✔':'✘'}</p>`);
+    modal('🔐 Snape\'s Safe', `<p>The safe swings open! Inside is a note:</p><div class="paper"><i>"The library door opens with:"</i><div class="codebox">${G.codeB.join('')}</div></div><p class="small">This is the code for <b>your partner's</b> door — tell them!</p>`);
   },
-  // ---------- PLAYER 2 (library) ----------
-  potionbook(){
-    modal('📕 "Potions of Passage"', `<p>A thick book is open on a reading desk. One page is marked:</p>
-      <div class="paper"><b>Passage Potions — by cauldron symbol</b><br><span class="small">Pour exactly these four essences, in this order:</span>
-      <table>${CSYM.map((s,i)=>`<tr><td style="font-size:1.6rem;width:50px">${s[0]}</td><td>${s[1]}</td><td>${G.t1table[i].map(c=>`<b style="color:${COLORS[c][0]}">${COLORS[c][1]}</b>`).join(' → ')}</td></tr>`).join('')}</table></div>
-      <p class="small">Which cauldron does your partner have? Ask them what symbol they can see!</p>`);
-  },
+  // ---------- PLAYER 2 ----------
+  potionbook(){ modal('📕 "Potions of Passage"', `<div class="paper"><b>Passage Potions — by cauldron symbol</b><br><span class="small">Pour exactly these four essences, in this order:</span>
+      <table>${CSYM.map((s,i)=>`<tr><td style="font-size:1.6rem;width:46px">${s[0]}</td><td>${s[1]}</td><td>${G.t1table[i].map(c=>`<b style="color:${COLORS[c][0]}">${COLORS[c][1]}</b>`).join(' → ')}</td></tr>`).join('')}</table>
+      <p><b>⚠ Warning:</b> if the cauldron gives off <b>purple smoke</b>, swap the <b>first</b> and the <b>last</b> essence!</p></div>
+      <p class="small">Ask your partner which symbol is on their cauldron — and what colour the smoke is.</p>`); },
+  brickbook(){ modal('📗 "Secret Passages of Hogwarts"', `<div class="paper"><b>The Dungeon Wall</b><br>To pass, tap four bricks in this order:<ol>${G.t3text.map(t=>`<li>${t}</li>`).join('')}</ol><span class="small">"Above, below, left and right" — as you face the wall.</span></div>`); },
+  howlerbook(){ modal('📙 "Howlers & How to Stop Them"', `<div class="paper"><b>Chapter 7: Defusing a Howler</b><br>Check the rules <b>from top to bottom</b>. Follow the <b>first</b> rule that fits — and ignore the rest! Ribbons are counted from the top.<ol>
+      <li>If the wax seal shows a <b>🐍 snake</b> and there is at least one <b>black</b> ribbon: cut the <b>first black</b> ribbon.</li>
+      <li>Otherwise, if there are <b>no red</b> ribbons: cut the <b>second</b> ribbon.</li>
+      <li>Otherwise, if the <b>last</b> ribbon is <b>white</b>: cut the <b>last</b> ribbon.</li>
+      <li>Otherwise, if there is <b>more than one blue</b> ribbon: cut the <b>last blue</b> ribbon.</li>
+      <li>Otherwise, if there are <b>no yellow</b> ribbons: cut the <b>first</b> ribbon.</li>
+      <li>Otherwise: cut the <b>third</b> ribbon.</li></ol>
+      <span class="small">Be quick: a Howler explodes after 60 seconds!</span></div>`); },
   t2(){
     if(S.done.t2) return modal('🌀 The Rune Gate','<p>The gate stands open. Solved!</p>');
     const v=[0,0,0,0];
-    modal('🌀 The Rune Gate', `<p>A gate of black iron blocks the way to the deepest shelves. Four runes glow on it, and below them is a 4-number lock.</p>
-      <div class="runebig">${G.t2runes.map(r=>`<div>${RUNES[r]}</div>`).join('')}</div>
-      <p class="small">Each rune stands for a number. Describe the runes to your partner — maybe they can translate them.</p>
+    modal('🌀 The Rune Gate', `<p>A black iron gate with four glowing runes. Each rune stands for a number.</p><div class="runebig">${G.t2runes.map(r=>`<div>${RUNES[r]}</div>`).join('')}</div>
       ${dialHTML(v,DIG,'g')}<div class="center"><button class="btn" id="tryG">Open the gate</button></div><div class="out" id="out"></div>`);
     wireDials(v,DIG,'g');
-    $('tryG').onclick=()=>{ if(v.join('')===G.t2runes.map(r=>G.t2map[r]).join('')) solve('t2','✨ The runes flare up and the gate swings open with a groan! Somewhere, a lock clicks open.'); else { shake(); out('The runes flicker red. Wrong numbers!'); } };
-  },
-  brickbook(){
-    modal('📗 "Secret Passages of Hogwarts"', `<p>A dusty book with a bookmark on the page about the dungeons:</p>
-      <div class="paper"><b>The Dungeon Wall</b><br>To pass, tap three bricks in this order:<ol>${G.t3text.map(t=>`<li>${t}</li>`).join('')}</ol>
-      <span class="small">"Above, below, left and right" — as you face the wall.</span></div>
-      <p class="small">You can't see the wall — but your partner can!</p>`);
+    $('tryG').onclick=()=>{ if(v.join('')===G.t2runes.map(r=>G.t2map[r]).join('')) solve('t2','✨ The runes flare up and the gate swings open with a groan!'); else { penalty(); out('The runes flash red and burn your fingers! Wrong numbers. (−20 seconds)'); } };
   },
   t4(){
     if(S.done.t4) return modal('📚 The Secret Shelf','<p>The shelf has swung aside. Solved!</p>');
-    let seq=[];
-    const label={ '🦁':'Lion', '🦡':'Badger', '🦅':'Eagle', '🐍':'Serpent' };
-    const deco={ x1:['The Dark Forces','#2a2a2a'], x2:['Hogwarts: A History','#6b4a8a'] };
+    let seq=[]; const deco={ x1:['The Dark Forces','#2a2a2a'], x2:['Hogwarts: A History','#6b4a8a'] };
     const draw=()=>{
-      modal('📚 The Secret Shelf', `<p>Six books stand on a strange shelf. Four of them are bound in the colours of the Hogwarts houses — but none of them has a title, only a colour. You have a feeling they must be pulled out in a certain order...</p>
-        <div class="books">${G.t4shelf.map(b=>{ const col=HOUSE[b]?HOUSE[b][1]:deco[b][1], tt=HOUSE[b]?'':deco[b][0]; return `<div class="book${seq.includes(b)?' pulled':''}" data-b="${b}" style="background:${col};height:${HOUSE[b]?150:130}px">${tt}</div>`; }).join('')}</div>
-        <div class="out" id="out"></div>`);
+      modal('📚 The Secret Shelf', `<p>Six books. Four are bound in the colours of the Hogwarts houses, without titles. They must be pulled out in the right order...</p>
+        <div class="books">${G.t4shelf.map(b=>{ const col=HOUSE[b]?HOUSE[b][1]:deco[b][1], tt=HOUSE[b]?'':deco[b][0]; return `<div class="book${seq.includes(b)?' pulled':''}" data-b="${b}" style="background:${col};height:${HOUSE[b]?150:130}px">${tt}</div>`; }).join('')}</div><div class="out" id="out"></div>`);
       document.querySelectorAll('.book').forEach(el=>el.onclick=()=>{ const b=el.dataset.b; if(seq.includes(b)) return; seq.push(b);
-        if(seq[seq.length-1]!==G.t4order[seq.length-1]){ seq=[]; draw(); shake(); out('THUNK. All the books slide back into place. Wrong order!'); return; }
-        if(seq.length===4){ solve('t4','✨ CLICK! The whole shelf swings aside like a door! Somewhere, a lock clicks open.'); return; }
-        draw(); out('The book slides out with a soft click...'); });
+        if(seq[seq.length-1]!==G.t4order[seq.length-1]){ seq=[]; draw(); penalty(); out('THUNK! The books slam back and one hits you on the head. Wrong order! (−20 seconds)'); return; }
+        sfx.click(); if(seq.length===4) return solve('t4','✨ CLICK! The whole shelf swings aside like a door!'); draw(); out('The book slides out with a soft click...'); });
     }; draw();
   },
+  t6(){
+    if(S.done.t6) return modal('🪜 The Moving Staircases','<p>You made it through the staircases. Solved!</p>');
+    let pos=G.mStart;
+    const draw=(msg='')=>{
+      const cells=[...Array(N*N)].map((_,i)=>`<div class="cell">${i===pos?'🧙':''}</div>`).join('');
+      modal('🪜 The Moving Staircases', `<p>It's pitch dark. You can only see yourself 🧙 — not the walls, not the exit. Your partner has a map that shows the way. Move step by step!</p>
+        <div class="maze bmaze" style="grid-template-columns:repeat(${N},auto)">${cells}</div>
+        <div class="arrows"><span></span><button data-m="n">⬆</button><span></span><button data-m="w">⬅</button><span></span><button data-m="e">➡</button><span></span><button data-m="s">⬇</button><span></span></div>
+        <div class="out" id="out">${msg}</div>`);
+      document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>move(b.dataset.m));
+    };
+    const move=d=>{
+      if(G.walls[pos][d]){ pos=G.mStart; penalty(); draw('💥 SMACK! You walked into a wall. Peeves cackles and throws you back to the start! (−20 seconds)'); return; }
+      pos+= {n:-N,s:N,e:1,w:-1}[d]; sfx.click();
+      if(pos===G.mGoal){ modal('🪜 The Moving Staircases','<p>You feel a door handle in the dark... you made it through!</p><div class="out" id="out"></div>'); solve('t6','✨ You found the way through the moving staircases!'); return; }
+      draw('Step...');
+    };
+    const key=e=>{ const m={ArrowUp:'n',ArrowDown:'s',ArrowLeft:'w',ArrowRight:'e'}[e.key]; if(m&&$('overlay').style.display==='flex'&&!S.done.t6&&document.querySelector('.bmaze')){ e.preventDefault(); move(m); } };
+    document.addEventListener('keydown',key); onClose=()=>document.removeEventListener('keydown',key);
+    draw();
+  },
   chest(){
-    if(!(S.done.t2&&S.done.t4)) return modal('🧰 Locked Chest', `<p>A heavy chest with two locks shaped like a rune and a book. It won't open yet.</p><p class="small">Solved: rune gate ${S.done.t2?'✔':'✘'} · secret shelf ${S.done.t4?'✔':'✘'}</p>`);
-    modal('🧰 The Chest', `<p>The chest creaks open. Inside lies a scrap of parchment:</p><div class="paper"><i>"The dungeon door opens with:"</i><div class="codebox">${G.codeA.join('')}</div></div><p class="small">This is the code for <b>your partner's</b> door. Tell it to them!</p>`);
+    if(!allMine()) return modal('🧰 Locked Chest', `<p>A heavy chest with three keyholes — shaped like a rune, a book and a staircase.</p><p>Rune gate ${S.done.t2?'✔':'✘'} · Secret shelf ${S.done.t4?'✔':'✘'} · Staircases ${S.done.t6?'✔':'✘'}</p>`);
+    modal('🧰 The Chest', `<p>The chest creaks open. Inside lies a scrap of parchment:</p><div class="paper"><i>"The dungeon door opens with:"</i><div class="codebox">${G.codeA.join('')}</div></div><p class="small">This is the code for <b>your partner's</b> door — tell them!</p>`);
   },
   door(){
     if(S.escaped) return winScreen();
     const v=[0,0,0,0];
-    modal('🚪 The Door', `<p>A heavy wooden door with a 4-number lock. You don't know the code... but someone else might find it.</p>${dialHTML(v,DIG,'d')}<div class="center"><button class="btn" id="tryD">Open the door</button></div><div class="out" id="out"></div>`);
+    modal('🚪 The Door', `<p>A heavy door with a 4-number lock. You don't know the code — but your partner can find it.</p>${dialHTML(v,DIG,'d')}<div class="center"><button class="btn" id="tryD">Open the door</button></div><div class="out" id="out"></div>`);
     wireDials(v,DIG,'d');
-    $('tryD').onclick=()=>{ const code=S.role==='A'?G.codeA:G.codeB; if(v.join('')===code.join('')){ S.escaped=true; winScreen(); } else { shake(); out('The lock doesn\'t move. Wrong code!'); } };
+    $('tryD').onclick=()=>{ const code=S.role==='A'?G.codeA:G.codeB; if(v.join('')===code.join('')){ S.escaped=true; save(); winScreen(); } else { penalty(); out('The lock doesn\'t move. Wrong code! (−20 seconds)'); } };
   }
 };
+function howlerAnswer(r,seal){
+  const cnt=c=>r.filter(x=>x===c).length;
+  if(seal==='🐍' && cnt('black')>0) return r.indexOf('black');
+  if(cnt('red')===0) return 1;
+  if(r[r.length-1]==='white') return r.length-1;
+  if(cnt('blue')>1) return r.lastIndexOf('blue');
+  if(cnt('yellow')===0) return 0;
+  return 2;
+}
 function winScreen(){
-  const s=Math.floor((Date.now()-S.start)/1000);
-  modal('🎉 You escaped!', `<div class="center"><div style="font-size:4rem">🚪✨</div><p>The door swings open and you run out into the corridor!</p>
-    <p style="font-size:1.3rem;color:#e8c547"><b>Your time: ${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}</b></p>
+  document.body.classList.remove('danger'); sfx.good(); setTimeout(sfx.good,400);
+  const used=TOTAL-S.left;
+  modal('🎉 You escaped!', `<div class="center"><div style="font-size:4rem">🚪✨🏃</div><p>The door bursts open and you sprint out into the corridor — just as Snape's shadow appears at the end of the hall!</p>
+    <p style="font-size:1.3rem;color:#e8c547"><b>Time left: ${fmt(S.left)}</b> (you needed ${fmt(used)})</p>
+    <p>${S.left>600?'🏆 "One hundred points to Gryffindor!" — Legendary teamwork!':S.left>240?'🥇 "Fifty points to Gryffindor!" — Great job!':'😅 That was close! "Ten points to Gryffindor."'}</p>
     <p>Has your partner escaped too? You only win <b>together</b>! 🤝</p><button class="btn" onclick="location.reload()">New game</button></div>`);
+}
+function gameOver(){
+  S.over=true; S.running=false; save(); document.body.classList.remove('danger'); sfx.boom();
+  modal('😱 Snape caught you!', `<div class="center"><div style="font-size:4rem">🧛‍♂️</div><p style="font-size:1.2rem"><i>"Well, well, well... What do we have here? <b>Detention</b> — for the rest of the year. And one hundred points from Gryffindor."</i></p>
+    <p>Try again with a new code — the puzzles will be different!</p><button class="btn" onclick="location.reload()">Try again</button></div>`);
 }
 lobby();
 </script>
