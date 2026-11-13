@@ -31,26 +31,30 @@
 <div class="card" id="app"></div>
 <script>
 const questions = [
-  { q: "What is the name of Harry's owl?", a: ["Errol", "Hedwig", "Pigwidgeon", "Fawkes"], c: 1,
-    f: "Hedwig is the snowy owl Hagrid gives Harry for his 11th birthday." },
-  { q: "Which house does the Sorting Hat put Harry in?", a: ["Slytherin", "Ravenclaw", "Gryffindor", "Hufflepuff"], c: 2,
-    f: "Gryffindor – even though the Hat thought about Slytherin!" },
-  { q: "What position does Harry play in Quidditch?", a: ["Keeper", "Beater", "Chaser", "Seeker"], c: 3,
-    f: "Seeker – he's the youngest one in a century." },
-  { q: "Which platform does the Hogwarts Express leave from?", a: ["Platform 7½", "Platform 9¾", "Platform 10¼", "Platform 3"], c: 1,
-    f: "Platform 9¾ at King's Cross station in London." },
-  { q: "What is the name of Hagrid's three-headed dog?", a: ["Fluffy", "Fang", "Norbert", "Buckbeak"], c: 0,
-    f: "Fluffy! (Fang is his boarhound and Norbert is a dragon.)" },
-  { q: "Which spell disarms an opponent?", a: ["Lumos", "Wingardium Leviosa", "Expelliarmus", "Alohomora"], c: 2,
-    f: "Expelliarmus – Harry's favourite spell." },
-  { q: "Who is the Half-Blood Prince?", a: ["Tom Riddle", "Severus Snape", "Sirius Black", "Remus Lupin"], c: 1,
-    f: "Severus Snape – his mother was a witch called Eileen Prince." },
-  { q: "What does the Marauder's Map show?", a: ["Hidden treasure", "The future", "Everyone at Hogwarts and where they are", "The Forbidden Forest only"], c: 2,
-    f: "\"I solemnly swear that I am up to no good.\"" },
-  { q: "What shape is Harry's scar?", a: ["A star", "A lightning bolt", "A snake", "A moon"], c: 1,
-    f: "A lightning bolt – from Voldemort's curse when he was a baby." },
-  { q: "What is Hermione's cat called?", a: ["Crookshanks", "Mrs Norris", "Scabbers", "Trevor"], c: 0,
-    f: "Crookshanks! (Scabbers is Ron's rat, Trevor is Neville's toad.)" }
+  { q: "Which of these was NOT one of Voldemort's Horcruxes?", a: ["Hufflepuff's Cup", "Ravenclaw's Diadem", "Gryffindor's Sword", "Slytherin's Locket"], c: 2,
+    f: "Gryffindor's Sword – it was actually used to DESTROY Horcruxes." },
+  { q: "What form does Hermione's Patronus take?", a: ["A hare", "An otter", "A Jack Russell terrier", "A doe"], c: 1,
+    f: "An otter. (Luna's is a hare, Ron's a terrier, Snape's a doe.)" },
+  { q: "What is the core of Harry's wand?", a: ["Dragon heartstring", "Unicorn hair", "Phoenix feather", "Thestral tail hair"], c: 2,
+    f: "Phoenix feather – from Fawkes, the same phoenix that gave a feather for Voldemort's wand." },
+  { q: "What is Dumbledore's full name?", a: ["Albus Percival Wulfric Brian Dumbledore", "Albus Brian Aberforth Dumbledore", "Albus Wulfric Gellert Dumbledore", "Albus Percival Ignotus Dumbledore"], c: 0,
+    f: "Albus Percival Wulfric Brian Dumbledore." },
+  { q: "Who kills Bellatrix Lestrange in the Battle of Hogwarts?", a: ["Neville Longbottom", "Hermione Granger", "Minerva McGonagall", "Molly Weasley"], c: 3,
+    f: "Molly Weasley – defending her daughter Ginny." },
+  { q: "What is the name of the Black family's house-elf?", a: ["Winky", "Hokey", "Kreacher", "Dobby"], c: 2,
+    f: "Kreacher. (Dobby served the Malfoys, Winky the Crouches, Hokey Hepzibah Smith.)" },
+  { q: "What was the name of Voldemort's mother?", a: ["Eileen Prince", "Merope Gaunt", "Ariana Dumbledore", "Kendra Gaunt"], c: 1,
+    f: "Merope Gaunt – a descendant of Salazar Slytherin." },
+  { q: "Which professional Quidditch team does Ginny play for?", a: ["Chudley Cannons", "Puddlemere United", "Holyhead Harpies", "Montrose Magpies"], c: 2,
+    f: "The Holyhead Harpies – an all-female team." },
+  { q: "What does Dumbledore tell Harry he sees in the Mirror of Erised?", a: ["His family", "The Elder Wand", "A pair of thick woollen socks", "Himself as Minister for Magic"], c: 2,
+    f: "Woollen socks – \"One can never have enough socks.\" (Probably not the whole truth!)" },
+  { q: "How many points is catching the Golden Snitch worth?", a: ["50", "100", "150", "200"], c: 2,
+    f: "150 points – and it ends the match." },
+  { q: "What is the address of the Order of the Phoenix headquarters?", a: ["4 Privet Drive", "12 Grimmauld Place", "Spinner's End", "Shell Cottage"], c: 1,
+    f: "Number 12, Grimmauld Place, London – Sirius Black's family home." },
+  { q: "Who originally made Harry's Invisibility Cloak, according to the Tale of the Three Brothers?", a: ["Antioch Peverell", "Cadmus Peverell", "Ignotus Peverell", "Godric Gryffindor"], c: 2,
+    f: "Ignotus Peverell – Harry is his descendant." }
 ];
 
 let i = 0, score = 0;
@@ -58,8 +62,8 @@ const app = document.getElementById("app");
 
 function start() {
   app.innerHTML = `
-    <h1>⚡ Harry Potter Quiz ⚡</h1>
-    <div class="sub">Made for Melih – are you a true wizard?</div>
+    <h1>⚡ Harry Potter Quiz: Hard Mode ⚡</h1>
+    <div class="sub">Made for Melih – HARD MODE. Only true wizards survive!</div>
     <div class="center"><div class="big">🧙‍♂️</div>
     <p>${questions.length} questions. Good luck!</p>
     <button class="next" onclick="show()">Start</button></div>`;
